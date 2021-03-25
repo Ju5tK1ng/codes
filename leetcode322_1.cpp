@@ -1,20 +1,19 @@
 #include<bits/stdc++.h>
 using namespace std;
 int coinChange(vector<int>& coins, int amount) {
-    sort(coins.rbegin(), coins.rend());
-    int a[10010];
-    memset(a, 0x3f, sizeof(a));
-    a[0] = 0;
-    for (int i = 0; i < coins.size(); i++)
+    int dp[10010];
+    memset(dp, 0x3f, sizeof(dp));
+    dp[0] = 0;
+    for (int &coin : coins)
     {
-        for (int j = coins[i]; j <= amount; j++)
+        for (int j = coin; j <= amount; j++)
         {
-            a[j] = min(a[j], a[j - coins[i]] + 1);
+            dp[j] = min(dp[j], dp[j - coin] + 1);
         }
     }
-    if (a[amount] != 0x3f3f3f3f)
+    if (dp[amount] != 0x3f3f3f3f)
     {
-        return a[amount];
+        return dp[amount];
     }
     else
     {
