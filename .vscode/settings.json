@@ -3,6 +3,8 @@
         "*.py": "python",
         "iostream": "cpp",
         "ostream": "cpp",
-        "functional": "cpp"
+        "functional": "cpp",
+        "chrono": "cpp",
+        "cmath": "cpp"
     }
 }
