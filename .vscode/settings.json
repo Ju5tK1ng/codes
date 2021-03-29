@@ -5,6 +5,7 @@
         "ostream": "cpp",
         "functional": "cpp",
         "chrono": "cpp",
-        "cmath": "cpp"
+        "cmath": "cpp",
+        "regex": "cpp"
     }
 }
