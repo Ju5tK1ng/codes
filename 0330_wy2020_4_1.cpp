@@ -1,3 +1,4 @@
+// 1.1
 #include<bits/stdc++.h>
 using namespace std;
 int main()
@@ -16,18 +17,6 @@ int main()
             if (s[i - 1] == 'N')
             {
                 dp[i] = dp[i - 1] + 1;
-                if (pre == 0)
-                {
-                    ans = max(ans, dp[i]);
-                }
-                else if (prepre == 0)
-                {
-                    ans = max(ans, dp[i] + dp[pre - 1] + 1);
-                }
-                else
-                {
-                    ans = max(ans, dp[i] + dp[pre - 1] + dp[prepre - 1] + 2);
-                }
             }
             else
             {
@@ -35,16 +24,17 @@ int main()
                 pre = i;
                 dp[i] = 0;
             }
-        }
-        if (pre == len)
-        {
-            if (prepre == 0)
+            if (pre == 0)
             {
-                ans = max(ans, dp[pre - 1] + 1);
+                ans = max(ans, dp[i]);
+            }
+            else if (prepre == 0)
+            {
+                ans = max(ans, dp[i] + dp[pre - 1] + 1);
             }
             else
             {
-                ans = max(ans, dp[pre - 1] + dp[prepre - 1] + 2);
+                ans = max(ans, dp[i] + dp[pre - 1] + dp[prepre - 1] + 2);
             }
         }
         cout << ans << endl;

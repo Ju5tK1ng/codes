@@ -6,6 +6,10 @@
         "functional": "cpp",
         "chrono": "cpp",
         "cmath": "cpp",
-        "regex": "cpp"
+        "regex": "cpp",
+        "deque": "cpp",
+        "string": "cpp",
+        "vector": "cpp",
+        "iosfwd": "cpp"
     }
 }
