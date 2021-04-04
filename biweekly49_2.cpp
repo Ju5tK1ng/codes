@@ -1,5 +1,6 @@
 #include<bits/stdc++.h>
 using namespace std;
+// 1.1
 bool areSentencesSimilar(string sentence1, string sentence2) {
     istringstream ss1(sentence1);
     istringstream ss2(sentence2);
@@ -18,26 +19,13 @@ bool areSentencesSimilar(string sentence1, string sentence2) {
         vs1.swap(vs2);
     }
     int cnt1 = 0, cnt2 = 0;
-    bool ok1 = false, ok2 = false;
-    while (cnt1 < vs1.size() && cnt2 < vs2.size() && vs1[cnt1] == vs2[cnt2])
+    while (cnt1 < vs1.size() && vs1[cnt1] == vs2[cnt1])
     {
-        ok1 = true;
         cnt1++;
-        cnt2++;
     }
-    while (cnt2 < vs2.size() && vs1[cnt1] != vs2[cnt2])
+    while (cnt2 < vs1.size() && vs1[vs1.size() - 1 - cnt2] == vs2[vs2.size() - 1 - cnt2])
     {
         cnt2++;
     }
-    while (cnt1 < vs1.size() && cnt2 < vs2.size() && vs1[cnt1] == vs2[cnt2])
-    {
-        ok2 = true;
-        cnt1++;
-        cnt2++;
-    }
-    if (cnt1 == vs1.size() && ok1 && ok2)
-    {
-        return true;
-    }
-    return false;
+    return cnt1 + cnt2 >= vs1.size();
 }

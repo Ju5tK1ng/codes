@@ -12,6 +12,8 @@
         "vector": "cpp",
         "iosfwd": "cpp",
         "*.tcc": "cpp",
-        "istream": "cpp"
+        "istream": "cpp",
+        "complex": "cpp",
+        "ratio": "cpp"
     }
 }
