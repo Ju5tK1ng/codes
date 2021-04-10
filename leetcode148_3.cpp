@@ -88,3 +88,86 @@ ListNode* merge_sort(ListNode* head)
 ListNode* sortList(ListNode* head) {
     return merge_sort(head);
 }
+
+// 3.2
+ListNode* merge(ListNode* l1, ListNode* l2)
+{
+    if (!l1)
+    {
+        return l2;
+    }
+    if (!l2)
+    {
+        return l1;
+    }
+    if (l1->val > l2->val)
+    {
+        swap(l1, l2);
+    }
+    ListNode *ans = l1, *tans = l1;
+    l1 = l1->next;
+    while (l1 && l2)
+    {
+        if (l1->val <= l2->val)
+        {
+            tans->next = l1;
+            l1 = l1->next;
+        }
+        else
+        {
+            tans->next = l2;
+            l2 = l2->next;
+        }
+        tans = tans->next;
+    }
+    tans->next = l1 ? l1 : l2;
+    return ans;
+}
+
+ListNode* cut(ListNode* p, int n)
+{
+    while (--n && p)
+    {
+        p = p->next;
+    }
+    if (!p)
+    {
+        return nullptr;
+    }
+    ListNode* next = p->next;
+    p->next = nullptr;
+    return next;
+}
+
+ListNode* sortList(ListNode* head) {
+    if (!head || !head->next)
+    {
+        return head;
+    }
+    ListNode* dummyHead = new ListNode();
+    dummyHead->next = head;
+    ListNode* p = head;
+    int n = 0;
+    while (p)
+    {
+        p = p->next;
+        n++;
+    }
+    for (int i = 1; i <= n; i *= 2)
+    {
+        p = dummyHead->next;
+        ListNode* tail = dummyHead;
+        while (p)
+        {
+            ListNode* left = p;
+            ListNode* right = cut(left, i);
+            p = cut(right, i);
+            tail->next = merge(left, right);
+            while (tail->next)
+            {
+                tail = tail->next;
+            }
+        }
+    }
+    return dummyHead->next;
+}
