@@ -14,8 +14,8 @@ int storeWater(vector<int>& bucket, vector<int>& vat) {
     priority_queue<vector<int>, vector<vector<int>>, Comp> q;
     for (int i = 0; i < n; i++)
     {
-        v[0] = bucket[0];
-        v[1] = vat[0];
+        v[0] = bucket[i];
+        v[1] = vat[i];
         if (v[1] == 0)
         {
             v[2] = 0;
@@ -62,4 +62,21 @@ int storeWater(vector<int>& bucket, vector<int>& vat) {
         }
     }
     return ans + maxn;
+}
+
+// 1.1
+int storeWater(vector<int>& bucket, vector<int>& vat) {
+    int ans = 1e9;
+    if(*max_element(vat.begin(), vat.end()) == 0)
+    {
+        return 0;
+    }
+    for(int i = 1;i <= 10000; i++){
+        int n = vat.size(), sum = i;
+        for(int j = 0; j < n; j++){
+            sum += max(0, (vat[j] - 1) / i + 1 - bucket[j]);
+        }
+        ans = min(ans, sum);
+    }
+    return ans;
 }
