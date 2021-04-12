@@ -11,28 +11,63 @@ struct TreeNode {
 class Solution {
 public:
 	vector<int> dfs(TreeNode* root, int k){
-		if (root==NULL){
-			vector<int> res;
-			res.push_back(0);
-			return res;
+		if (root == nullptr)
+		{
+			return vector<int>(1, 0);
 		}
-		vector<int> vl=dfs(root->left ,k);
-		vector<int> vr=dfs(root->right ,k);
-		vector<int> res;
-		res.resize(k+1);
-		for (int i=0;i<vl.size();i++)
-			for (int j=0;j<vr.size();j++){
-				res[0]=max(res[0],vl[i]+vr[j]);
-				if (i+j+1<=k)
-					res[i+j+1]=max(res[i+j+1],vl[i]+vr[j]+root->val);
+		vector<int> left = dfs(root->left, k);
+		vector<int> right = dfs(root->right, k);
+		vector<int> ans(min(k + 1, int(left.size() + right.size())), 0);
+		for (int i = 0; i < left.size(); i++)
+		{
+			for (int j = 0; j < right.size(); j++)
+			{
+				ans[0] = max(ans[0], left[i] + right[j]);
+				if (i + j + 1 <= k)
+				{
+					ans[i + j + 1] = max(ans[i + j + 1], left[i] + right[j] + root->val);
+				}
 			}
-		return res;
+		}
+		return ans;
 	}
     int maxValue(TreeNode* root, int k) {
-		vector<int> result=dfs(root,k);
-		int ans=0;
-		for (int i=0;i<=result.size();i++)
-			if (i<=k) ans=max(ans,result[i]);
+		vector<int> ans=dfs(root,k);
+		return *max_element(ans.begin(), ans.end());
+    }
+};
+
+// 1.1
+class Solution {
+public:
+	void dfs(TreeNode* root, int* dp, int k){
+		if (root == nullptr)
+		{
+			return;
+		}
+		int left[11] = {0}, right[11] = {0};
+		dfs(root->left, left, k);
+		dfs(root->right, right, k);
+		for (int i = 0; i <= k; i++)
+		{
+			for (int j = 0; j <= k; j++)
+			{
+				dp[0] = max(dp[0], left[i] + right[j]);
+				if (i + j + 1 <= k)
+				{
+					dp[i + j + 1] = max(dp[i + j + 1], left[i] + right[j] + root->val);
+				}
+			}
+		}
+		return;
+	}
+    int maxValue(TreeNode* root, int k) {
+		int dp[11] = {0}, ans = 0;
+		dfs(root, dp, k);
+		for (int i = 0; i <= k; i++)
+		{
+			ans = max(ans, dp[i]);
+		}
 		return ans;
     }
 };
