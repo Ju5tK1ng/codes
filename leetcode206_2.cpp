@@ -17,9 +17,25 @@ ListNode* reverseList(ListNode* head) {
         head->next = pre;
         pre = head;
         head = next;
-        cout << head->val << endl;
     }
     return pre;
+}
+
+// 3.0
+ListNode* reverseList(ListNode* head) {
+    if (!head)
+    {
+        return head;
+    }
+    ListNode *pre = new ListNode(0, head), *next;
+    while (head->next)
+    {
+        next = head->next;
+        head->next = next->next;
+        next->next = pre->next;
+        pre->next = next;
+    }
+    return pre->next;
 }
 
 int main()
