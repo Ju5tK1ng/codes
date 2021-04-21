@@ -5,6 +5,7 @@ using namespace std;
 char inBuffer[4096];    // 输入缓冲区
 int line;               // 当前行数
 int col;                // 当前列数
+int preCol;             // 上一行列数
 FILE* in;               // 输入流文件
 FILE* out;              // 输出流文件
 
@@ -63,7 +64,7 @@ unordered_map<string, int> keyword =
     {"typedef", 31},
     {"volatile", 32},
 
-    /* 符号(将其看作关键字) */
+    /* 符号(与关键字一起编码) */
     /* 关系运算符 */
     {"<", 33},
     {"<=", 34},
@@ -105,13 +106,14 @@ unordered_map<string, int> keyword =
     {"get", 62},
     {"put", 63},
 
-    /* 其它 */
+    /* 其它(与关键字一起编码) */
     {"num", 64},    // 常数
     {"cha", 65},    // 字符
     {"str", 66},    // 字符串
     {"boolean", 67},// 布尔
     {"array", 68},  // 数组
-    {"id", 69}      // 用户自定义标识符
+    {"func", 69},   // 函数
+    {"id", 70}      // 用户自定义标识符
 };
 
 /* 用户自定义标识符表 */
@@ -131,6 +133,7 @@ void get_char()
     if (C == '\n' || C == '\r')
     {
         line++;
+        preCol = col;
         col = 0;
     }
     else
@@ -213,8 +216,16 @@ bool digit_hex()
  */
 void retract()
 {
+    if (C == '\n' || C == '\r')
+    {
+        line--;
+        col = preCol;
+    }
+    else
+    {
+        col--;
+    }
     forwardP--;
-    col--;
 }
 
 /*
@@ -247,9 +258,59 @@ int SToI(string s)
 /*
  * 将token中的字符串转换成浮点数
  */
-void SToF()
+float SToF(string s)
 {
-
+    float num = 0;          // 整数部分
+    int exp = 0;            // 指数部分
+    int index;              // 索引
+    bool positive;          // 是否为正数
+    if (s[0] == '-')        // 整数部分为负数
+    {
+        index = 1;
+        positive = false;
+    }
+    else                    // 整数部分为正数
+    {
+        index = 0;
+        positive = true;
+    }
+    for (; s[index] != 'e' && s[index] != 'E'; index++) // 读取整数部分
+    {
+        num = num * 10 + s[index] - '0';
+    }
+    if (positive == false)  // 若整数部分为负数则取负
+    {
+        num = -num;
+    }
+    if (s[index + 1] == '-')// 指数部分为负数 
+    {
+        index = index + 2;
+        positive = false;
+    }
+    else                    // 指数部分为正数
+    {
+        index = index + 1;
+        positive = true;
+    }
+    for (; index < s.size(); index++)  // 读取指数部分
+    {
+        exp = exp * 10 + s[index] - '0';
+    }
+    if (positive == false)  // 若指数部分为负数则除以10的exp次方
+    {
+        while (exp--)
+        {
+            num /= 10;
+        }
+    }
+    else                    // 若指数部分为正数则乘以10的exp次方
+    {
+        while (exp--)
+        {
+            num *= 10;
+        }
+    }
+    return num;
 }
 
 /*
@@ -325,7 +386,7 @@ void scanner()
                         return_mark(token, keyword["num"], "dec");
                     }
                 }
-                else if (digit())   // 十进制常数
+                else if (digit())   // 非0十进制常数
                 {
                     state = 2;
                 }
@@ -442,18 +503,38 @@ void scanner()
                             int identry = table_insert();   // 返回标识符在符号表的入口指针
                             return_mark(token, keyword["id"], to_string(identry));
                             statis[token]++;    // 统计单词个数
-                            get_char();     // 读一个字符判断是否为数组
+                            get_char();     // 读一个字符判断是否为数组或函数
                             if (C == '[')   // 数组状态
                             {
                                 while (C != ']')
                                 {
+                                    if (C == EOF)
+                                    {
+                                        error();
+                                        break;
+                                    }
                                     cat();
                                     get_char();
                                 }
                                 cat();
                                 return_mark(token, keyword["array"], "-");
                             }
-                            else            // 非数组状态，后退一个字符
+                            else if (C == '(')  // 函数状态
+                            {
+                                while (C != ')')
+                                {
+                                    if (C == EOF)
+                                    {
+                                        error();
+                                        break;
+                                    }
+                                    cat();
+                                    get_char();
+                                }
+                                cat();
+                                return_mark(token, keyword["func"], "-");
+                            }
+                            else            // 非数组或函数
                             {
                                 retract();
                             }
@@ -602,8 +683,14 @@ void scanner()
                 }
                 break;
             case 11:    // 注释
+                token = "";
                 do
                 {
+                    if (C == EOF)
+                    {
+                        error();
+                        break;
+                    }
                     get_char();
                 } while(C != '*');
                 cat();
@@ -672,8 +759,13 @@ void scanner()
                 cat();
                 get_char();
                 return_mark(token, keyword["\""], "-");
-                while (C != '\'')   // 读入字串
+                while (C != '\"')   // 读入字符串
                 {
+                    if (C == EOF)
+                    {
+                        error();
+                        break;
+                    }
                     cat();
                     get_char();
                 }
@@ -712,7 +804,7 @@ int main()
     in = fopen("in.txt", "r");
     out = fopen("out.txt", "w");
     char ch;
-    int size;
+    int size;   // 字符总数
     while ((ch = fgetc(in)) != EOF)
     {
         inBuffer[size++] = ch;
