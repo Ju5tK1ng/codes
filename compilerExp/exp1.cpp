@@ -369,57 +369,44 @@ void scanner()
                 }
                 else if (C == '0')      // 八进制或0或十六进制常数
                 {
-                    cat();
-                    get_char();
-                    if (digit_oct())    // 八进制常数
-                    {
-                        state = 3;
-                    }
-                    else if (C == 'X' || C == 'x')  // 十六进制常数
-                    {
-                        state = 4;
-                    }
-                    else                // 十进制常数0
-                    {
-                        retract();
-                        state = 0;
-                        return_mark(token, keyword["num"], "dec");
-                    }
+                    state = 5;
                 }
                 else if (digit())   // 非0十进制常数
                 {
-                    state = 2;
+                    state = 4;
                 }
                 else
                 {
                     switch (C)
                     {
                         case '<':   // '<'状态
-                            state = 6;
-                            break;
-                        case '>':   // '>'状态
-                            state = 7;
-                            break;
-                        case '!':   // '!'状态
-                            state = 8;
-                            break;
-                        case '=':   // '='状态
                             state = 9;
                             break;
-                        case '/':   // '/'状态
+                        case '>':   // '>'状态
                             state = 10;
                             break;
-                        case '&':   // '&'状态
+                        case '!':   // '!'状态
+                            state = 11;
+                            break;
+                        case '=':   // '='状态
                             state = 12;
                             break;
-                        case '|':   // '|'状态
+                        case '/':   // '/'状态
                             state = 13;
                             break;
+                        case '&':   // '&'状态
+                            state = 15;
+                            break;
+                        case '|':   // '|'状态
+                            state = 16;
+                            break;
                         case '\'':  // '\''状态
-                            state = 14;
+                            state = 17;
+                            return_mark("\'", keyword["\'"], "-");
                             break;
                         case '\"':  // '\"'状态
-                            state = 15;
+                            state = 18;
+                            return_mark("\"", keyword["\""], "-");
                             break;
                         case '+':   // 返回'+'
                             state = 0;
@@ -470,7 +457,7 @@ void scanner()
                             return_mark(":", keyword[":"], "-");
                             break;
                         default:    // error状态
-                            state = 16;
+                            state = 19;
                             break;
                     }
                 }
@@ -506,33 +493,11 @@ void scanner()
                             get_char();     // 读一个字符判断是否为数组或函数
                             if (C == '[')   // 数组状态
                             {
-                                while (C != ']')
-                                {
-                                    if (C == EOF)
-                                    {
-                                        error();
-                                        break;
-                                    }
-                                    cat();
-                                    get_char();
-                                }
-                                cat();
-                                return_mark(token, keyword["array"], "-");
+                                state = 2;
                             }
                             else if (C == '(')  // 函数状态
                             {
-                                while (C != ')')
-                                {
-                                    if (C == EOF)
-                                    {
-                                        error();
-                                        break;
-                                    }
-                                    cat();
-                                    get_char();
-                                }
-                                cat();
-                                return_mark(token, keyword["func"], "-");
+                                state = 3;
                             }
                             else            // 非数组或函数
                             {
@@ -542,16 +507,44 @@ void scanner()
                     }
                 }
                 break;
-            case 2:     // 十进制常数状态
+            case 2:     // 数组状态
+                cat();
+                get_char();
+                if (C != ']')
+                {
+                    state = 2;
+                }
+                else
+                {
+                    cat();
+                    return_mark(token, keyword["array"], "-");
+                    state = 0;
+                }
+                break;
+            case 3:     // 函数状态
+                cat();
+                get_char();
+                if (C != ')')
+                {
+                    state = 3;
+                }
+                else
+                {
+                    cat();
+                    return_mark(token, keyword["func"], "-");
+                    state = 0;
+                }
+                break;
+            case 4:     // 十进制常数状态
                 cat();
                 get_char();
                 if (digit())    // 十进制常数状态
                 {
-                    state = 2;
+                    state = 4;
                 }
                 else if (C == 'E' || C == 'e')  // 指数状态
                 {
-                    state = 5;
+                    state = 8;
                 }
                 else
                 {
@@ -560,12 +553,30 @@ void scanner()
                     return_mark(token, keyword["num"], "dec");
                 }
                 break;
-            case 3:     // 八进制常数状态
+            case 5:
+                cat();
+                get_char();
+                if (digit_oct())    // 八进制常数
+                {
+                    state = 6;
+                }
+                else if (C == 'X' || C == 'x')  // 十六进制常数
+                {
+                    state = 7;
+                }
+                else                // 十进制常数0
+                {
+                    retract();
+                    state = 0;
+                    return_mark(token, keyword["num"], "dec");
+                }
+                break;
+            case 6:     // 八进制常数状态
                 cat();
                 get_char();
                 if (digit_oct())
                 {
-                    state = 3;
+                    state = 6;
                 }
                 else
                 {
@@ -574,12 +585,12 @@ void scanner()
                     return_mark(token, keyword["num"], "oct");
                 }
                 break;
-            case 4:     // 十六进制常数状态
+            case 7:     // 十六进制常数状态
                 cat();
                 get_char();
                 if (digit_hex())
                 {
-                    state = 4;
+                    state = 7;
                 }
                 else
                 {
@@ -588,12 +599,12 @@ void scanner()
                     return_mark(token, keyword["num"], "hex");
                 }
                 break;
-            case 5:     // 指数形式的浮点数状态
+            case 8:     // 指数形式的浮点数状态
                 cat();
                 get_char();
                 if (digit())
                 {
-                    state = 5;
+                    state = 8;
                 }
                 else
                 {
@@ -602,7 +613,7 @@ void scanner()
                     return_mark(token, keyword["num"], "exp_float");
                 }
                 break;
-            case 6:     // '<'状态
+            case 9:     // '<'状态
                 cat();
                 get_char();
                 if (C == '=')   // <=
@@ -618,7 +629,7 @@ void scanner()
                     return_mark(token, keyword["<"], "-");
                 }
                 break;
-            case 7:     // '>'状态
+            case 10:     // '>'状态
                 cat();
                 get_char();
                 if (C == '=')   // >=
@@ -634,7 +645,7 @@ void scanner()
                     return_mark(token, keyword[">"], "-");
                 }
                 break;
-            case 8:     // '!'状态
+            case 11:     // '!'状态
                 cat();
                 get_char();
                 if (C == '=')   // !=
@@ -650,7 +661,7 @@ void scanner()
                     return_mark(token, keyword["!"], "-");
                 }
                 break;
-            case 9:     // '='状态
+            case 12:     // '='状态
                 cat();
                 get_char();
                 if (C == '=')   // ==
@@ -666,14 +677,15 @@ void scanner()
                     return_mark(token, keyword["="], "-");
                 }
                 break;
-            case 10:     // '/'状态
+            case 13:     // '/'状态
                 cat();
                 get_char();
                 if (C == '*')   // /* 注释开始
                 {
                     cat();
-                    state = 11;
+                    state = 14;
                     return_mark(token, keyword["/*"], "-");
+                    token = "";
                 }
                 else            // <
                 {
@@ -682,33 +694,31 @@ void scanner()
                     return_mark(token, keyword["/"], "-");
                 }
                 break;
-            case 11:    // 注释
-                token = "";
-                do
-                {
-                    if (C == EOF)
-                    {
-                        error();
-                        break;
-                    }
-                    get_char();
-                } while(C != '*');
-                cat();
+            case 14:    // 注释状态
                 get_char();
-                if (C != '/')   // 注释未结束
+                if (C != '*')       // 注释未结束
                 {
-                    retract();
-                    state = 11;
-                    token = "";
+                    state = 14;
                 }
-                else    // */ 注释结束
+                else
                 {
                     cat();
-                    state = 0;
-                    return_mark(token, keyword["*/"], "-");
+                    get_char();
+                    if (C != '/')   // 注释未结束
+                    {
+                        retract();
+                        state = 14;
+                        token = "";
+                    }
+                    else            // */ 注释结束
+                    {
+                        cat();
+                        state = 0;
+                        return_mark(token, keyword["*/"], "-");
+                    }
                 }
                 break;
-            case 12:     // '&'状态
+            case 15:     // '&'状态
                 cat();
                 get_char();
                 if (C == '&')   // &&
@@ -724,7 +734,7 @@ void scanner()
                     return_mark(token, keyword["&"], "-");
                 }
                 break;
-            case 13:     // '|'状态
+            case 16:     // '|'状态
                 cat();
                 get_char();
                 if (C == '|')   // ||
@@ -740,42 +750,37 @@ void scanner()
                     return_mark(token, keyword["|"], "-");
                 }
                 break;
-            case 14:     // '\''状态
+            case 17:     // '\''状态
                 cat();
                 get_char();
-                return_mark(token, keyword["\'"], "-");
                 if (C != '\'')   // 读入字符
                 {
-                    cat();
-                    get_char();
+                    state = 17;
                 }
-                cat();
-                return_mark(token, keyword["cha"], "-");
-                token = C;  // '\''状态
-                return_mark(token, keyword["\'"], "-");
-                state = 0;
+                else
+                {
+                    cat();
+                    return_mark(token, keyword["cha"], "-");
+                    return_mark("\'", keyword["\'"], "-");
+                    state = 0;
+                }
                 break;
-            case 15:     // '\"'状态
+            case 18:     // '\"'状态
                 cat();
                 get_char();
-                return_mark(token, keyword["\""], "-");
-                while (C != '\"')   // 读入字符串
+                if (C != '\"')  // 读入字符串
                 {
-                    if (C == EOF)
-                    {
-                        error();
-                        break;
-                    }
-                    cat();
-                    get_char();
+                    state = 18;
                 }
-                cat();
-                return_mark(token, keyword["str"], "-");
-                token = C;  // '\"'状态
-                return_mark(token, keyword["\""], "-");
-                state = 0;
+                else
+                {
+                    cat();
+                    return_mark(token, keyword["str"], "-");
+                    return_mark("\"", keyword["\""], "-");
+                    state = 0;
+                }
                 break;
-            case 16:    // error状态
+            case 19:    // error状态
                 error();
                 state = 0;
                 break;
