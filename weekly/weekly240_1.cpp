@@ -39,3 +39,28 @@ public:
         return year;
     }
 };
+
+// 2.0
+class Solution {
+public:
+    int maximumPopulation(vector<vector<int>>& logs) {
+        const int offset = 1950;
+        int n = logs.size(), ans = 0, cnt = 0, year;
+        vector<int> d(101, 0);
+        for (int i = 0; i < n; i++)
+        {
+            d[logs[i][0] - offset]++;
+            d[logs[i][1] - offset]--;
+        }
+        for (int i = 0; i < 101; i++)
+        {
+            cnt += d[i];
+            if (cnt > ans)
+            {
+                ans = cnt;
+                year = i;
+            }
+        }
+        return year + offset;
+    }
+};
