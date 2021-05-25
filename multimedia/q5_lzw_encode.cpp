@@ -4,15 +4,17 @@ int main()
 {
     string input;
     unordered_map<string, int> dictionary;
-    cout << "Please input string: ";
+    int step = 0;
+    cout << "Please input the string: ";
     cin >> input;
-    cout << "output: ";
+    cout << "step   position   dictionary   output" << endl;
     for (int i = 0; i < input.size(); i++)
     {
         string c = input.substr(i, 1);
         if (!dictionary.count(c))
         {
             dictionary[c] = dictionary.size() + 1;
+            printf("                    (%d) %s\n", dictionary[c], c.c_str());
         }
     }
     string p = input.substr(0, 1);
@@ -26,10 +28,10 @@ int main()
         else
         {
             dictionary[p + c] = dictionary.size() + 1;
-            cout << dictionary[p];
+            printf(" %-8d %-9d (%d) %-7s (%d)\n", ++step, i + 1 - p.size(), dictionary[p + c], (p + c).c_str(), dictionary[p]);
             p = c;
         }
     }
-    cout << dictionary[p] << endl;
+    printf(" %-8d --        --  --      (%d)\n", ++step, dictionary[p]);
     return 0;
 }

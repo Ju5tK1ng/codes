@@ -21,6 +21,10 @@
         "initializer_list": "cpp",
         "utility": "cpp",
         "valarray": "cpp",
-        "algorithm": "cpp"
+        "algorithm": "cpp",
+        "forward_list": "cpp",
+        "list": "cpp",
+        "iterator": "cpp",
+        "scoped_allocator": "cpp"
     }
 }
