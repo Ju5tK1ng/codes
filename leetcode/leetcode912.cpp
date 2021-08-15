@@ -108,7 +108,7 @@ public:
     // 归并
     void Merge_Sort(vector<int>& nums, vector<int>& T, int l, int r)
     {
-        if (r - l < 2)
+        if (r - l <= 1)
         {
             return;
         }
@@ -136,10 +136,11 @@ public:
     // 快速
     void Quick_Sort(vector<int>& nums, int l, int r)
     {
-        if (l + 1 >= r)
+        if (r - l <= 1)
         {
             return;
         }
+        swap(nums[l], nums[l + (r - l) / 2]);
         int i = l, j = r - 1, pivot = nums[l];
         while (i < j)
         {
