@@ -25,6 +25,7 @@
         "forward_list": "cpp",
         "list": "cpp",
         "iterator": "cpp",
-        "scoped_allocator": "cpp"
+        "scoped_allocator": "cpp",
+        "type_traits": "cpp"
     }
 }

@@ -1,7 +1,8 @@
 #ifndef __MYCOMPLEX__
 #define __MYCOMPLEX__
 
-class complex; 
+// 前置声明
+class complex;
 complex&
   __doapl (complex* ths, const complex& r);
 complex&
@@ -36,11 +37,11 @@ __doapl (complex* ths, const complex& r)
   ths->im += r.im;
   return *ths;
 }
- 
+
 inline complex&
 complex::operator += (const complex& r)
 {
-  return __doapl (this, r);
+  return __doapl (this, r); // __doapl还会被其他函数调用，所以不在此函数实现+=
 }
 
 inline complex&
@@ -50,13 +51,13 @@ __doami (complex* ths, const complex& r)
   ths->im -= r.im;
   return *ths;
 }
- 
+
 inline complex&
 complex::operator -= (const complex& r)
 {
   return __doami (this, r);
 }
- 
+
 inline complex&
 __doaml (complex* ths, const complex& r)
 {
@@ -71,7 +72,7 @@ complex::operator *= (const complex& r)
 {
   return __doaml (this, r);
 }
- 
+
 inline double
 imag (const complex& x)
 {
@@ -139,7 +140,7 @@ operator * (double x, const complex& y)
   return complex (x * real (y), x * imag (y));
 }
 
-complex
+inline complex
 operator / (const complex& x, double y)
 {
   return complex (real (x) / y, imag (x) / y);
@@ -202,7 +203,7 @@ polar (double r, double t)
 }
 
 inline complex
-conj (const complex& x) 
+conj (const complex& x)
 {
   return complex (real (x), -imag (x));
 }
@@ -214,7 +215,3 @@ norm (const complex& x)
 }
 
 #endif   //__MYCOMPLEX__
-
-
-
-
