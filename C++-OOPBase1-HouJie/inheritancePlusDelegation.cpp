@@ -8,7 +8,7 @@ class IObersever
 {
 public:
     virtual void Update() = 0;
-    ~IObersever(){}
+    virtual ~IObersever(){}
 };
 
 #endif
@@ -25,7 +25,13 @@ public:
         iOberseverList.push_back(iObserver);
     }
 
-    void notify()
+    void DoSth()
+    {
+        // xxx;
+        Notify();
+    }
+
+    void Notify()
     {
         for (auto iobserver : iOberseverList)
         {
@@ -66,6 +72,6 @@ int main()
         Observer* o = new Observer(i);
         s.AddObserver(o);
     }
-    s.notify();
+    s.DoSth();
     return 0;
 }
