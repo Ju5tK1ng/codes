@@ -12,5 +12,6 @@ int main()
     {
         cout << bitset<8>(i & -i) << endl;
     }
+    cout << __cplusplus <<endl;
     return 0;
 }
