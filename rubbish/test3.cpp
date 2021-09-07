@@ -59,5 +59,16 @@ int main()
     cout << sizeof(E) << endl;
     cout << sizeof(F) << endl;
     cout << sizeof(G) << endl;
+    cout << "------------" << endl;
+    A* pa = new A();
+    int i = 1;
+    int* pi = &i;
+    double d = 2;
+    double* pd = &d;
+    cout << sizeof(pa) << endl;
+    cout << sizeof(pi) << endl;
+    cout << sizeof(pd) << endl;
+    int* pn;
+    cout << sizeof(pn) << endl;
     return 0;
 }
