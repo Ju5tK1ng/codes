@@ -23,5 +23,10 @@ int main()
         v.reserve(i);
         cout << i << ": " << v.size() << " " << v.max_size() << " " << v.capacity() << endl;
     }
+    v.resize(200);
+    cout << 200 << ": " << v.size() << " " << v.max_size() << " " << v.capacity() << endl;
+    v.resize(150);
+    vector<int> v2(v);
+    cout << 150 << ": " << v2.size() << " " << v2.max_size() << " " << v2.capacity() << endl;
     return 0;
 }

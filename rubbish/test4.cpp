@@ -3,7 +3,7 @@ using namespace std;
 
 struct A
 {
-    void Print()
+    virtual void Print()
     {
         cout << 1 << endl;
     }
@@ -11,7 +11,7 @@ struct A
 
 struct B : public A
 {
-    void Print()
+    virtual void Print()
     {
         cout << 2 << endl;
     }
@@ -28,5 +28,9 @@ int main()
     C c;
     b.Print();
     c.Print();
+    B* d = new B();
+    A* a = (A*)d;
+    a->Print();
+    a->A::Print();
     return 0;
 }

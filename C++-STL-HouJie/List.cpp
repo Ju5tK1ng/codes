@@ -22,6 +22,12 @@ class List_Iterator
 {
 public:
     typedef List_Iterator<T> self;
+    typedef std::bidirectional_iterator_tag iterator_category;
+    typedef T value_type;
+    typedef T* pointer;
+    typedef T& reference;
+    typedef ptrdiff_t difference_type;
+
     List_Node<T>* node;
 
     List_Iterator(List_Node<T>* _node) : node(_node) {}
@@ -78,7 +84,7 @@ template<typename T>
 class List
 {
 private:
-    int _size;
+    size_t _size;
     List_Node<T>* node;
 public:
     typedef List_Iterator<T> iterator;
@@ -99,6 +105,7 @@ public:
 
     List(const List& l)
     {
+        cout << "ctr" << endl;
         _size = 0;
         node = new List_Node<T>();
         node->next = node;
@@ -113,13 +120,14 @@ public:
     {
         if (this == &l)
         {
-            return this;
+            return *this;
         }
         clear();
         for (auto ite = l.begin(); ite != l.end(); ite++)
         {
             push_back(*ite);
         }
+        return *this;
     }
 
     bool operator == (const List& l) const
@@ -136,7 +144,7 @@ public:
         return i1 == end1 && i2 == end2;
     }
 
-    int size() const
+    size_t size() const
     {
         return _size;
     }
@@ -238,11 +246,13 @@ int main()
         cout << *ite << endl;
     }
     cout << "-----------" << endl;
-    List<int> L3 = L2;
+    List<int> L3;
+    L3 = L2;
     cout << (L3 == L2) << endl;
     cout << L3.empty() << endl;
     L3.clear();
     cout << L3.empty() << endl;
+    cout << sizeof(List<int>) << endl;
 
     cout << "--------------------------" << endl;
 
@@ -266,10 +276,12 @@ int main()
         cout << *ite << endl;
     }
     cout << "-----------" << endl;
-    list<int> l3 = l2;
+    list<int> l3;
+    l3 = l2;
     cout << (l3 == l2) << endl;
     cout << l3.empty() << endl;
     l3.clear();
     cout << l3.empty() << endl;
+    cout << sizeof(list<int>) << endl;
     return 0;
 }

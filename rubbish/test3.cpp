@@ -49,6 +49,17 @@ struct G
     char c;
 };
 
+struct vptr
+{
+    char a;
+    virtual void test() {}
+};
+
+string test()
+{
+    string a = "123";
+    return a;
+}
 
 int main()
 {
@@ -70,5 +81,9 @@ int main()
     cout << sizeof(pd) << endl;
     int* pn;
     cout << sizeof(pn) << endl;
+
+    cout << sizeof(vptr) << endl;
+    const char* c = test().c_str();
+    cout << c << endl;
     return 0;
 }
