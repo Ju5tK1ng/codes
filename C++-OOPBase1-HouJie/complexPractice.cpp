@@ -6,6 +6,10 @@ using namespace std;
 
 class Complex
 {
+private:
+    double re, im;
+    friend Complex& __dapl(Complex* ths, const Complex& r);
+
 public:
     Complex(double real = 0, double imag = 0) : re(real), im(imag) {}
     Complex& operator += (const Complex& r);
@@ -17,11 +21,6 @@ public:
     {
         return im;
     }
-
-private:
-    double re, im;
-    friend Complex& __dapl(Complex* ths, const Complex& r);
-
 };
 
 inline Complex& __dapl(Complex* ths, const Complex& r)
@@ -58,12 +57,14 @@ inline ostream& operator << (ostream& os, const Complex& r)
     }
 }
 
-template <typename T> bool IsConst(T& x)
+template <typename T>
+bool IsConst(T& x)
 {
     return false;
 }
 
-template <typename T> bool IsConst(const T& x)
+template <typename T>
+bool IsConst(const T& x)
 {
     return true;
 }

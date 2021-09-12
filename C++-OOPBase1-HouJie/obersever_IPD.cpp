@@ -8,7 +8,7 @@ class IObersever
 {
 public:
     virtual void Update() = 0;
-    virtual ~IObersever(){}
+    virtual ~IObersever() {}
 };
 
 #endif
@@ -19,6 +19,9 @@ public:
 
 class Subject
 {
+private:
+    vector<IObersever*> iOberseverList;
+
 public:
     void AddObserver(IObersever* iObserver)
     {
@@ -38,9 +41,6 @@ public:
             iobserver->Update();
         }
     }
-
-private:
-    vector<IObersever*> iOberseverList;
 };
 
 #endif
@@ -51,15 +51,15 @@ private:
 
 class Observer : public IObersever
 {
+private:
+    int order;
+
 public:
     Observer(int _order) : order(_order) {}
     virtual void Update()
     {
         cout << "Update: " << order << endl;
     }
-
-private:
-    int order;
 };
 
 #endif

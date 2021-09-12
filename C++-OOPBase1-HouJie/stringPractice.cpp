@@ -7,6 +7,9 @@ using namespace std;
 
 class String
 {
+private:
+    char* m_data;
+
 public:
     String (const char* c_str = 0)
     {
@@ -49,10 +52,6 @@ public:
     {
         return m_data;
     }
-
-private:
-    char* m_data;
-
 };
 
 ostream& operator << (ostream& os, const String& str)

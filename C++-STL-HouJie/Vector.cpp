@@ -179,6 +179,7 @@ public:
 int main()
 {
     Vector<int> V;
+    cout << sizeof(V) << endl;
     cout << 0 << ": " << V.size() << " " << V.capacity() << endl;
     cout << V.empty() << endl;
     for (int i = 0; i < 5; i++)
@@ -194,6 +195,7 @@ int main()
     {
         cout << *V2.insert(V2.begin() + 2, i) << ": " << V2.size() << " " << V2.capacity() << endl;
     }
+    sort(V2.begin(), V2.end());
     cout << "---------------" << endl;
     Vector<int> V3;
     V3 = V2;
@@ -212,6 +214,7 @@ int main()
     cout << "-----------------------------------" << endl;
 
     vector<int> v;
+    cout << sizeof(v) << endl;
     cout << 0 << ": " << v.size() << " " << v.capacity() << endl;
     cout << v.empty() << endl;
     for (int i = 0; i < 5; i++)
@@ -227,6 +230,7 @@ int main()
     {
         cout << *v2.insert(v2.begin() + 2, i) << ": " << v2.size() << " " << v2.capacity() << endl;
     }
+    sort(v2.begin(), v2.end());
     cout << "---------------" << endl;
     vector<int> v3;
     v3 = v2;
