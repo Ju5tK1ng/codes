@@ -1,0 +1,30 @@
+#include <bits/stdc++.h>
+using namespace std;
+class Solution {
+public:
+    int firstMissingPositive(vector<int>& nums) {
+        int l = nums.size();
+        for (int& i : nums)
+        {
+            if (i <= 0)
+            {
+                i = l + 1;
+            }
+        }
+        for (int& i : nums)
+        {
+            if (abs(i) <= l && nums[abs(i) - 1] > 0)
+            {
+                nums[abs(i) - 1] *= -1;
+            }
+        }
+        for (int i = 0; i < l; i++)
+        {
+            if (nums[i] > 0)
+            {
+                return i + 1;
+            }
+        }
+        return l + 1;
+    }
+};
