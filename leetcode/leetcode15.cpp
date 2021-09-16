@@ -61,12 +61,12 @@ public:
             {
                 break;
             }
-            if (begin != nums.begin(), *prev(begin, 1) == *begin)
+            if (begin != nums.begin() && *prev(begin, 1) == *begin)
             {
                 continue;
             }
-            auto l = next(begin, 1);
-            auto r = prev(end, 1);
+            auto l = begin + 1;
+            auto r = end - 1;
             while (l < r)
             {
                 if (*begin + *l + *r < 0)
@@ -80,12 +80,12 @@ public:
                 else
                 {
                     ans.push_back(vector<int>{*begin, *l, *r});
-                    while (l + 1 < r && *l == *next(l, 1))
+                    while (l + 1 < r && *l == *(l + 1))
                     {
                         l++;
                     }
                     l++;
-                    while (l < r - 1 && *r == *prev(r, 1))
+                    while (l < r - 1 && *r == *(r - 1))
                     {
                         r--;
                     }

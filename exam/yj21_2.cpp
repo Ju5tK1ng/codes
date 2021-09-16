@@ -1,6 +1,41 @@
 #include <bits/stdc++.h>
 using namespace std;
 
+void C(int m, int n) {
+    size_t ans = 1;
+    for (int i = m - n + 1, j = 1; j <= n; i++, j++) {
+        ans = ans * i / j;
+    }
+    cout << ans / (2 * n + 1) << endl;
+}
+
+
+int main()
+{
+    int row = 50, col = 25;
+    vector<size_t> pre(50, 0), cur(50, 0);
+    pre[0] = cur[0] = 1;
+    for (int r = 2; r < row; r++)
+    {
+        for (int c = 1; c < col; c++)
+        {
+            if (c * 2 > r)
+            {
+                continue;
+            }
+            cur[c] = cur[c - 1] + pre[c];
+            // cur[c] %= 10000;
+            if (c * 2 == r)
+            {
+                cout << c << "\t" << cur[c] << "\t";
+                C(3 * c, c);
+            }
+        }
+        pre.swap(cur);
+    }
+    return 0;
+}
+
 class Solution {
 private:
     size_t a[10010];
