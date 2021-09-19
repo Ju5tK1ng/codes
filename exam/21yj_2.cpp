@@ -1,19 +1,39 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-void C(int m, int n) {
+void C(int n) {
+    vector<int> v;
+    vector<int> s;
     size_t ans = 1;
-    for (int i = m - n + 1, j = 1; j <= n; i++, j++) {
-        ans = ans * i / j;
+    for (int i = 2 * n + 2; i <= 3 * n; i++)
+    {
+        v.push_back(i);
     }
-    cout << ans / (2 * n + 1) << endl;
+    for (int i = 2; i <= n; i++)
+    {
+        s.push_back(i);
+    }
+    for (int& i : v) {
+        vector<int> erase;
+        vector<int> insert;
+        for (int& j : s)
+        {
+            int gcd = __gcd(i, j);
+            if (gcd != 1)
+            {
+                i /= gcd;
+                j /= gcd;
+            }
+        }
+        ans = (ans * i) % 10000;
+    }
+    cout << ans << "\t" << s.size() << endl;
 }
-
 
 int main()
 {
-    int row = 50, col = 25;
-    vector<size_t> pre(50, 0), cur(50, 0);
+    int row = 500, col = 250;
+    vector<size_t> pre(row, 0), cur(col, 0);
     pre[0] = cur[0] = 1;
     for (int r = 2; r < row; r++)
     {
@@ -24,11 +44,11 @@ int main()
                 continue;
             }
             cur[c] = cur[c - 1] + pre[c];
-            // cur[c] %= 10000;
+            cur[c] %= 10000;
             if (c * 2 == r)
             {
                 cout << c << "\t" << cur[c] << "\t";
-                C(3 * c, c);
+                C(c);
             }
         }
         pre.swap(cur);
