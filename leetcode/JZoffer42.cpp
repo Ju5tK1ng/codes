@@ -1,5 +1,6 @@
 #include <bits/stdc++.h>
 using namespace std;
+// 同lc53
 class Solution {
 public:
     int maxSubArray(vector<int>& nums) {

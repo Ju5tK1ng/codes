@@ -1,4 +1,4 @@
-#include<bits/stdc++.h>
+#include <bits/stdc++.h>
 using namespace std;
 class LRUCache {
     int size;
@@ -8,7 +8,7 @@ public:
     LRUCache(int capacity) {
         size = capacity;
     }
-    
+
     int get(int key) {
         auto it = hash.find(key);
         if (it == hash.end())
@@ -18,7 +18,7 @@ public:
         cache.splice(cache.begin(), cache, it->second);
         return cache.begin()->second;
     }
-    
+
     void put(int key, int value) {
         auto it = hash.find(key);
         if (it != hash.end())
@@ -27,7 +27,7 @@ public:
             cache.begin()->second = value;
             return;
         }
-        cache.insert(cache.begin(), make_pair(key, value));
+        cache.push_front(make_pair(key, value));
         hash[key] = cache.begin();
         if (cache.size() > size)
         {
@@ -42,7 +42,7 @@ struct Node
 {
     int key, val;
     Node *pre, *next;
-    Node(int k, int v) : key(k), val(v), pre(nullptr), next(nullptr) {} 
+    Node(int k, int v) : key(k), val(v), pre(nullptr), next(nullptr) {}
 };
 class LRUCache {
     int size = 0, capacity;
@@ -82,7 +82,7 @@ public:
         head->next = tail;
         tail->pre = head;
     }
-    
+
     int get(int key) {
         auto it = hash.find(key);
         if (it == hash.end())
@@ -92,7 +92,7 @@ public:
         Splice(it->second);
         return head->next->val;
     }
-    
+
     void put(int key, int value) {
         auto it = hash.find(key);
         if (it != hash.end())
