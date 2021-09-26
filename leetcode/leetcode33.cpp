@@ -1,4 +1,4 @@
-#include<bits/stdc++.h>
+#include <bits/stdc++.h>
 using namespace std;
 class Solution {
 public:
@@ -35,7 +35,7 @@ public:
                 else
                 {
                     l = m + 1;
-                }  
+                }
             }
         }
         return -1;

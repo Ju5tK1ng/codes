@@ -7,9 +7,8 @@ public:
         int ans = INT_MIN, sum = 0;
         for (int& i : nums)
         {
-            sum += i;
+            sum = max(sum + i, i);
             ans = max(ans, sum);
-            sum = max(sum, 0);
         }
         return ans;
     }
