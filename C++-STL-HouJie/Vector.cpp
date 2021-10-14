@@ -155,9 +155,10 @@ public:
         {
             iterator new_start = new T[new_size];
             iterator new_finish = uninitialized_copy(start, finish, new_start);
+            delete[] start;
             start = new_start;
             finish = new_finish;
-            end_of_storage = finish;
+            end_of_storage = start + new_size;
         }
         else
         {

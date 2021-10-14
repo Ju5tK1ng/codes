@@ -83,7 +83,7 @@ int main()
 
     Complex* p = new Complex(3, 6);
     /* new的过程
-    *  void* mem = operator new(sizeof(Complex)); // operator newn内部调用malloc()
+    *  void* mem = operator new(sizeof(Complex)); // operator new内部调用malloc()
     *  Complex* p = static_cast<Complex*>(mem);
     *  p->Complex::Complex(3, 6);
     */
