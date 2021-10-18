@@ -7,7 +7,7 @@ struct ListNode {
     ListNode(int x) : val(x), next(nullptr) {}
     ListNode(int x, ListNode *next) : val(x), next(next) {}
 };
-
+// lc21
 // 1.0
 class Solution {
 public:

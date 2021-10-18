@@ -1,6 +1,6 @@
 #include <bits/stdc++.h>
 using namespace std;
-// 同lc46
+// lc46
 class Solution {
 public:
     vector<string> permutation(string s) {

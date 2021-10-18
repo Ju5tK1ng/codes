@@ -1,5 +1,6 @@
-#include<bits/stdc++.h>
+#include <bits/stdc++.h>
 using namespace std;
+// lc169
 class Solution {
 public:
     int majorityElement(vector<int>& nums) {

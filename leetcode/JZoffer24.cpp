@@ -1,4 +1,4 @@
-#include<bits/stdc++.h>
+#include <bits/stdc++.h>
 using namespace std;
 struct ListNode {
     int val;
@@ -7,7 +7,7 @@ struct ListNode {
     ListNode(int x) : val(x), next(nullptr) {}
     ListNode(int x, ListNode *next) : val(x), next(next) {}
 };
-// 同lc206
+// lc206
 class Solution {
 public:
     ListNode* reverseList(ListNode* head) {

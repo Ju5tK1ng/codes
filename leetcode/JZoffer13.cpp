@@ -59,7 +59,7 @@ public:
 
     int movingCount(int m, int n, int k) {
         int ans = 0;
-        vector<vector<int>> dp(m, vector<int>(n, 0));
+        vector<vector<char>> dp(m, vector<char>(n, 0));
         dp[0][0] = 1;
         for (int i = 0; i < m; i++)
         {

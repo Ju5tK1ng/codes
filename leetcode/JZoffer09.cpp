@@ -1,6 +1,6 @@
 #include <bits/stdc++.h>
 using namespace std;
-// 同lc232
+// lc232
 class CQueue {
 private:
     stack<int> in, out;
