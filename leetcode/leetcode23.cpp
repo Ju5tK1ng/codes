@@ -1,4 +1,4 @@
-#include<bits/stdc++.h>
+#include <bits/stdc++.h>
 using namespace std;
 struct ListNode {
     int val;
@@ -24,7 +24,7 @@ ListNode* mergeKLists(vector<ListNode*>& lists) {
             q.push(list);
         }
     }
-    ListNode* ans = new ListNode(0), *cur =  ans;
+    ListNode* dummyHead = new ListNode(0), *cur =  dummyHead;
     while (!q.empty())
     {
         cur->next = q.top();
@@ -35,5 +35,5 @@ ListNode* mergeKLists(vector<ListNode*>& lists) {
             q.push(cur->next);
         }
     }
-    return ans->next;
+    return dummyHead->next;
 }

@@ -1,4 +1,4 @@
-#include<bits/stdc++.h>
+#include <bits/stdc++.h>
 using namespace std;
 struct TreeNode {
     int val;
@@ -17,7 +17,7 @@ public:
             return ans;
         }
         bool rev = false;
-        queue<TreeNode*> q;    
+        queue<TreeNode*> q;
         q.push(root);
         while (!q.empty())
         {

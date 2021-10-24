@@ -1,34 +1,30 @@
-#include<bits/stdc++.h>
+#include <bits/stdc++.h>
 using namespace std;
-bool isValid(string s) {
-    stack<char> sc;
-    for (char& c : s)
-    {
-        if (c == '(' || c == '[' || c == '{')
+class Solution {
+public:
+    bool isValid(string s) {
+        stack<char> sc;
+        for (char& c : s)
         {
-            sc.push(c);
-        }
-        else
-        {
-            if (!sc.empty() && (
-                sc.top() == '(' && c == ')' ||
-                sc.top() == '[' && c == ']' ||
-                sc.top() == '{' && c == '}'))
+            if (c == '(' || c == '[' || c == '{')
             {
-                sc.pop();
+                sc.push(c);
             }
             else
             {
-                return false;
+                if (!sc.empty() && (
+                    sc.top() == '(' && c == ')' ||
+                    sc.top() == '[' && c == ']' ||
+                    sc.top() == '{' && c == '}'))
+                {
+                    sc.pop();
+                }
+                else
+                {
+                    return false;
+                }
             }
         }
+        return sc.empty();
     }
-    return sc.empty();
-}
-int main()
-{
-    string s;
-    cin >> s;
-    cout << isValid(s) << endl;
-    return 0;
-}
+};
