@@ -20,7 +20,7 @@ public:
                     if (curSum - minSum > sum)
                     {
                         sum = curSum - minSum;
-                        ans = {t, mini, b - 1, i};
+                        ans = {t, mini, b, i};
                     }
                     if (curSum < minSum)
                     {

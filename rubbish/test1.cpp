@@ -1,4 +1,4 @@
-#include<bits/stdc++.h>
+#include <bits/stdc++.h>
 using namespace std;
 int main()
 {
@@ -7,7 +7,7 @@ int main()
     int c = 3;
     a += b += c;
     cout << a << endl << b << endl << c << endl;
-    cout << (int)'0' << " " << ('0' ^ 1) << " " << endl;
+    cout << (int)'0' << " " << ('0' ^ 1) << " " << ('1' ^ 1) << endl;
     string s;
     s.push_back(49);
     cout << s << endl;
