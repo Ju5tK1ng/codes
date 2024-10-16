@@ -8,7 +8,8 @@ struct DayData
     int base, centi, countBase;
 };
 
-float COMMISSION = 0.00025;
+float COMMISSION = 0.0025;
+// float COMMISSION = 0;
 string DATA_PATH = "D:\\gp\\data\\data.csv";
 string line;
 stringstream ss;
@@ -16,7 +17,8 @@ char c;
 vector<string> dataList;
 vector<DayData> dayDataList;
 // vector<string> START_DATE = {"2015-03-18"};
-vector<string> START_DATE = {"2017-09-05"};
+// vector<string> START_DATE = {"2017-09-05"};
+vector<string> START_DATE = {"2015-06-08","2016-01-29","2017-10-31","2018-01-31","2019-02-28","2021-02-10","2023-01-31","2024-04-30"};
 
 string float2Str(float f, int decimal = 2)
 {
@@ -25,7 +27,7 @@ string float2Str(float f, int decimal = 2)
     return oss.str();
 }
 
-int startSimulation(int dataIndex, vector<float> buyPercent, vector<float> sellPercent, bool output = false)
+int startSimulation(int dataIndex, vector<float> buyPercent, vector<float> sellPercent, float profitPercent = 1.5, bool output = false)
 {
     string date;
     float ope, high, low, close, newPrice, sellPrice;
@@ -60,7 +62,8 @@ int startSimulation(int dataIndex, vector<float> buyPercent, vector<float> sellP
         centi = dayData.centi;
         countBase = dayData.countBase;
         sellPrice = 0;
-        if (ope > 4000 && (cost + ope * count) > -cost * 0.1)
+        // if (ope > 4000 && (cost + ope * count) > -cost * (2.1 - ope / 5000))
+        if (ope > 4000 && (cost + ope * count) > -cost * profitPercent)
         {
             cost = cost + (ope * count) * (1 - COMMISSION);
             count = 0;
@@ -75,7 +78,7 @@ int startSimulation(int dataIndex, vector<float> buyPercent, vector<float> sellP
                 }
                 newCount = countBase;
                 newPrice = ope + centi * sellPercent[j];
-                if (newPrice <= high)
+                if (newPrice <= high && (cost == 0 || cost + newPrice * count > 0))
                 {
                     newCount = min(newCount, count);
 
@@ -99,7 +102,7 @@ int startSimulation(int dataIndex, vector<float> buyPercent, vector<float> sellP
             newCount = countBase;
             newPrice = ope - centi * buyPercent[j];
             profit = totalCost + cost - newPrice * newCount - (close < newPrice ? 0 : sellPrice);
-            if (newPrice >= low && profit > -320000)
+            if (newPrice >= low && (cost == 0 || cost + newPrice * count < 0) && profit > -320000)
             {
                 cost = cost - (newPrice * newCount) * (1 + COMMISSION);
                 count = count + newCount;
@@ -180,12 +183,15 @@ void simulataAll()
                 for (float jj = j; jj <= 3; jj += 0.1)
                 {
                     sellPercent[1] = jj;
-                    totalProfit = 0;
-                    for (int k = 0; k < START_DATE.size(); k++)
+                    for (float x = 1; x <= 3; x += 0.1)
                     {
-                        totalProfit += startSimulation(k, buyPercent, sellPercent);
+                        totalProfit = 0;
+                        for (int k = 0; k < START_DATE.size(); k++)
+                        {
+                            totalProfit += startSimulation(k, buyPercent, sellPercent, x);
+                        }
+                        profitList.push_back(vector2Str(buyPercent) + ',' + vector2Str(sellPercent) + ',' + float2Str(x) + ',' + to_string(totalProfit));
                     }
-                    profitList.push_back(vector2Str(buyPercent) + ',' + vector2Str(sellPercent) + ',' + to_string(totalProfit));
                     if (progress != float2Str(profitList.size() / size * 100, 0))
                     {
                         progress = float2Str(profitList.size() / size * 100, 0);
@@ -207,9 +213,9 @@ void simulataAll()
 
 void simulataOne()
 {
-    vector<float> buyPercent = {1, 1.5};
-    vector<float> sellPercent = {1.5, 2};
-    startSimulation(0, buyPercent, sellPercent, true);
+    vector<float> buyPercent = {0, 0.4};
+    vector<float> sellPercent = {1.1, 2.5};
+    startSimulation(0, buyPercent, sellPercent, 1.5, true);
 }
 
 int main()
