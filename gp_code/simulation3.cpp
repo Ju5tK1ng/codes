@@ -19,12 +19,11 @@ vector<DayData> dayDataList;
 // vector<string> START_DATE = {"2015-08-06"};
 // vector<string> START_DATE = {"2015-06-08","2016-01-29","2017-10-31","2018-01-31","2019-02-28","2021-02-10","2023-01-31","2024-04-30"};
 // vector<string> START_DATE = {"2015-01-05","2016-01-15","2017-02-10","2018-02-28","2019-03-07","2020-03-25","2021-04-20","2022-05-20","2023-06-20"};
-vector<string> START_DATE = {"2015-03-19","2015-08-06","2015-12-25","2017-08-28","2018-02-09","2018-06-07",
-                             "2019-03-06","2019-10-21","2020-05-29","2022-05-09","2023-01-04","2023-09-06"}; // 3800+
-// vector<string> START_DATE = {"2015-06-08","2016-01-29","2017-10-31","2018-01-31","2019-02-28","2021-02-10","2023-01-31","2024-04-30",
-//                              "2015-01-05","2016-01-15","2017-02-10","2018-02-28","2019-03-07","2020-03-25","2021-04-20","2022-05-20",
-//                              "2015-03-19","2015-08-06","2015-12-25","2017-08-28","2018-02-09","2018-06-07","2023-06-20",
-//                              "2019-03-06","2019-10-21","2020-05-29","2022-05-09","2023-01-04","2023-09-06"};
+// vector<string> START_DATE = {"2015-03-19","2015-08-06","2015-12-25","2017-08-28","2018-02-09","2018-06-07",
+//                              "2019-03-06","2019-10-21","2020-05-29","2022-05-09","2023-01-04","2023-09-06"}; // 3800+
+vector<string> START_DATE = {"2015-07-16", "2017-10-12", "2018-05-22", "2019-04-01",
+                             "2019-11-20", "2020-06-15", "2022-05-06", "2023-08-10"}; // 3900+
+
 string float2Str(float f, int decimal = 2)
 {
     ostringstream oss;
@@ -162,10 +161,10 @@ void simulataAll()
                 {
                     for (float jj = j; jj <= 3; jj += 0.1)
                     {
-                        for (float jjj = jj; jjj <= 5; jjj += 0.5)
-                        {
+                        // for (float jjj = jj; jjj <= 5; jjj += 0.5)
+                        // {
                             size += 1;
-                        }
+                        // }
                     }
                 }
             }
@@ -173,7 +172,7 @@ void simulataAll()
     }
     cout << "size: " << size << endl;
     vector<float> buyPercent = {0, 0, 0};
-    vector<float> sellPercent = {0, 0, 0};
+    vector<float> sellPercent = {0, 0};
     vector<string> profitList;
     int count = 0;
     for (float i = 0; i <= 1; i += 0.1)
@@ -191,16 +190,16 @@ void simulataAll()
                     for (float jj = j; jj <= 3; jj += 0.1)
                     {
                         sellPercent[1] = jj;
-                        for (float jjj = jj; jjj <= 5; jjj += 0.5)
-                        {
-                            sellPercent[2] = jjj;
+                        // for (float jjj = jj; jjj <= 5; jjj += 0.5)
+                        // {
+                        // sellPercent[2] = jjj;
                             totalProfit = 0;
                             count += 1;
                             for (int k = 0; k < START_DATE.size(); k++)
                             {
                                 totalProfit += startSimulation(k, buyPercent, sellPercent, 0.1);
                             }
-                            if (totalProfit > 1900000)
+                            if (totalProfit > 1100000)
                             {
                                 profitList.push_back(vector2Str(buyPercent) + ',' + vector2Str(sellPercent) + ',' + "0.1" + ',' + to_string(totalProfit));
                             }
@@ -209,7 +208,7 @@ void simulataAll()
                                 progress = float2Str((float)count / size * 100, 1);
                                 cout << progress << "%" << endl;
                             }
-                        }
+                        // }
                     }
                 }
             }
@@ -256,6 +255,6 @@ int main()
         dayDataList.push_back(dayData);
     }
     simulataOne();
-    // simulataAll();
+    simulataAll();
     return 0;
 }
