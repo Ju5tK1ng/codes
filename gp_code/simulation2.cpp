@@ -34,7 +34,7 @@ float ope, high, low, close, newPrice, sellPrice, totalCost, cost, price, profit
 int base, cent, countBase;
 vector<string> simulationList;
 DayData dayData;
-int startSimulation(int dataIndex, vector<float> buyPercent, vector<float> sellPercent, float profitPercent = 0.1, bool output = false)
+int startSimulation(int dataIndex, vector<float> buyPercent, vector<float> sellPercent, float profitPercent = 1.5, bool output = false)
 {
     totalCost = 0;
     cost = 0;
@@ -126,7 +126,7 @@ int startSimulation(int dataIndex, vector<float> buyPercent, vector<float> sellP
     }
     if (output)
     {
-        string simualtionPath = "D:\\gp\\data\\" + START_DATE[dataIndex] + "III.csv";
+        string simualtionPath = "D:\\gp\\data\\" + START_DATE[dataIndex] + "II.csv";
         ofstream simualtionFile(simualtionPath);
         for (string line : simulationList)
         {
@@ -150,17 +150,17 @@ void simulataAll()
 {
     string progress = "";
     int size = 0;
-    for (float i = 0; i <= 1; i += 0.1)
+    for (float i = 0.1; i <= 0.2; i += 0.1)
     {
-        for (float ii = i; ii <= 2; ii += 0.1)
+        for (float ii = i; ii <= 1; ii += 0.1)
         {
-            for (float iii = ii; iii <= 3; iii += 0.1)
+            for (float iii = 1; iii <= 2.5; iii += 0.1)
             {
-                for (float j = 0; j <= 2; j += 0.1)
+                for (float iiii = iii; iiii <= 4; iiii += 0.1)
                 {
-                    for (float jj = j; jj <= 3; jj += 0.1)
+                    for (float j = 0.6; j <= 2; j += 0.1)
                     {
-                        for (float jjj = jj; jjj <= 5; jjj += 0.5)
+                        for (float jj = j; jj <= 5; jj += 0.1)
                         {
                             size += 1;
                         }
@@ -170,35 +170,35 @@ void simulataAll()
         }
     }
     cout << "size: " << size << endl;
-    vector<float> buyPercent = {0, 0, 0, 0};
-    vector<float> sellPercent = {0, 0, 0};
+    vector<float> buyPercent = {0, 0, 0, 0, 0};
+    vector<float> sellPercent = {0, 0};
     vector<string> profitList;
     int count = 0;
-    for (float i = 0; i <= 1; i += 0.1)
+    for (float i = 0.1; i <= 0.2; i += 0.1)
     {
         buyPercent[1] = i;
-        for (float ii = i; ii <= 2; ii += 0.1)
+        for (float ii = i; ii <= 1; ii += 0.1)
         {
             buyPercent[2] = ii;
-            for (float iii = ii; iii <= 3; iii += 0.1)
+            for (float iii = 1; iii <= 2.5; iii += 0.1)
             {
                 buyPercent[3] = iii;
-                for (float j = 0; j <= 2; j += 0.1)
+                for (float iiii = iii; iiii <= 4; iiii += 0.1)
                 {
-                    sellPercent[0] = j;
-                    for (float jj = j; jj <= 3; jj += 0.1)
+                    buyPercent[4] = iiii;
+                    for (float j = 0.6; j <= 2; j += 0.1)
                     {
-                        sellPercent[1] = jj;
-                        for (float jjj = jj; jjj <= 5; jjj += 0.5)
+                        sellPercent[0] = j;
+                        for (float jj = j; jj <= 5; jj += 0.1)
                         {
-                            sellPercent[2] = jjj;
+                            sellPercent[1] = jj;
                             totalProfit = 0;
                             count += 1;
                             for (int k = 0; k < START_DATE.size(); k++)
                             {
                                 totalProfit += startSimulation(k, buyPercent, sellPercent, 0.1);
                             }
-                            if (totalProfit > 1400000)
+                            if (totalProfit > 1500000)
                             {
                                 profitList.push_back(vector2Str(buyPercent) + ',' + vector2Str(sellPercent) + ',' + "0.1" + ',' + to_string(totalProfit));
                             }
@@ -213,7 +213,7 @@ void simulataAll()
             }
         }
     }
-    string totalPath = "D:\\gp\\data\\total" + START_DATE[0] + "III.csv";
+    string totalPath = "D:\\gp\\data\\total" + START_DATE[0] + "II.csv";
     ofstream totalFile(totalPath);
     for (string line : profitList)
     {
@@ -223,8 +223,8 @@ void simulataAll()
 }
 void simulataOne()
 {
-    vector<float> buyPercent = {0.0, 0.9, 1.4};
-    vector<float> sellPercent = {1.3, 1.5, 5};
+    vector<float> buyPercent = {0.0, 0.5, 1.0, 1.5};
+    vector<float> sellPercent = {1.1, 2.1, 3.1};
     totalProfit = 0;
     for (int k = 0; k < START_DATE.size(); k++)
     {
