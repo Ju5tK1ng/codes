@@ -126,7 +126,7 @@ int startSimulation(int dataIndex, vector<float> buyPercent, vector<float> sellP
     }
     if (output)
     {
-        string simualtionPath = "D:\\gp\\data\\" + START_DATE[dataIndex] + "II.csv";
+        string simualtionPath = "D:\\gp\\data\\" + START_DATE[dataIndex] + "IV.csv";
         ofstream simualtionFile(simualtionPath);
         for (string line : simulationList)
         {
@@ -150,7 +150,7 @@ void simulataAll()
 {
     string progress = "";
     int size = 0;
-    for (float i = 0.1; i <= 0.21; i += 0.1)
+    for (float i = 0.1; i <= 0.2; i += 0.1)
     {
         for (float ii = i; ii <= 1; ii += 0.1)
         {
@@ -174,7 +174,7 @@ void simulataAll()
     vector<float> sellPercent = {0, 0};
     vector<string> profitList;
     int count = 0;
-    for (float i = 0.1; i <= 0.21; i += 0.1)
+    for (float i = 0.1; i <= 0.2; i += 0.1)
     {
         buyPercent[1] = i;
         for (float ii = i; ii <= 1; ii += 0.1)
@@ -196,9 +196,9 @@ void simulataAll()
                             count += 1;
                             for (int k = 0; k < START_DATE.size(); k++)
                             {
-                                totalProfit += startSimulation(k, buyPercent, sellPercent, 0.1);
+                                totalProfit += startSimulation(k, buyPercent, sellPercent, 0.1) / (START_DATE.size() - k);
                             }
-                            if (totalProfit > 1500000)
+                            if (totalProfit > 340000)
                             {
                                 profitList.push_back(vector2Str(buyPercent) + ',' + vector2Str(sellPercent) + ',' + "0.1" + ',' + to_string(totalProfit));
                             }
@@ -213,7 +213,7 @@ void simulataAll()
             }
         }
     }
-    string totalPath = "D:\\gp\\data\\total" + START_DATE[0] + "II.csv";
+    string totalPath = "D:\\gp\\data\\total" + START_DATE[0] + "IV.csv";
     ofstream totalFile(totalPath);
     for (string line : profitList)
     {
@@ -223,12 +223,12 @@ void simulataAll()
 }
 void simulataOne()
 {
-    vector<float> buyPercent = {0.0, 0.5, 1.0, 1.5};
-    vector<float> sellPercent = {1.1, 2.1, 3.1};
+    vector<float> buyPercent = {0.0, 0.1, 0.6, 2.2, 2.2};
+    vector<float> sellPercent = {0.9, 4.8};
     totalProfit = 0;
     for (int k = 0; k < START_DATE.size(); k++)
     {
-        totalProfit += startSimulation(k, buyPercent, sellPercent, 0.1, true);
+        totalProfit += startSimulation(k, buyPercent, sellPercent, 0.1, true) / (START_DATE.size() - k);
     }
     cout << "totalProfit: " << totalProfit << endl;
 }
