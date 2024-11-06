@@ -4,16 +4,17 @@ struct DayData
 {
     string date;
     float ope, high, low, close;
-    int base, cent, countBase;
 };
 float COMMISSION = 0.00005;
-float BUILD_PRICE = 3870;
+float BUILD_PRICE = 3947;
 int ONE_COST = 20000;
+int MAX_COST = 300000;
 string DATA_PATH = "D:\\gp\\data\\";
 string INPUT_PATH = DATA_PATH + "dataEtf.csv";
-string line;
+string line, date;
 vector<string> dataList;
 vector<DayData> dayDataList;
+vector<string> simulationDateList;
 vector<string> START_DATE = {"2015-05-29",};
 // vector<string> START_DATE = {"2015-05-29","2020-07-03","2022-03-09","2023-07-31","2024-10-14"}; // 3.8+
 string float2Str(float f, int decimal = 2)
@@ -32,9 +33,8 @@ string vector2Str(vector<float> vec, int decimal = 2)
     str = str.substr(0, str.length() - 1);
     return str;
 }
-string date;
 float ope, high, low, close, newPrice, sellPrice, totalCost, cost, price, profit, point, newCount, cnt, totalProfit;
-int base, cent, countBase, originalProfit, buildCnt, dateCnt;
+int originalProfit, dateCnt;
 vector<string> simulationList;
 DayData dayData;
 int startSimulation(int dataIndex, vector<float> buyPercent, vector<float> sellPercent, float profitPercent = 1.5, bool output = false)
@@ -45,17 +45,16 @@ int startSimulation(int dataIndex, vector<float> buyPercent, vector<float> sellP
     price = 0;
     profit = 0;
     point = 0;
-    buildCnt = 0;
-    dateCnt = 0;
     simulationList.clear();
     simulationList.push_back("date,open,high,low,close,totalCost,cost,cnt,price,profit,point");
     bool start = false;
-    bool startBuild = false;
+    bool startBuild = true;
     for (int i = 0; i < dayDataList.size(); i++)
     {
-        if (dayDataList[i].date == START_DATE[dataIndex])
+        if (dayDataList[i].date == simulationDateList[dataIndex])
         {
             start = true;
+            // continue;
         }
         if (!start)
         {
@@ -67,23 +66,7 @@ int startSimulation(int dataIndex, vector<float> buyPercent, vector<float> sellP
         high = dayData.high;
         low = dayData.low;
         close = dayData.close;
-        base = dayData.base;
-        cent = dayData.cent;
-        countBase = dayData.countBase;
         sellPrice = 0;
-        if (!startBuild && cnt == 0)
-        {
-            if (close * 0.999 < BUILD_PRICE && BUILD_PRICE < close * 1.001)
-            {
-                if (output)
-                {
-                    cout << date << " " << close << endl;
-                }
-                buildCnt += 1;
-                startBuild = true;
-            }
-            continue;
-        }
         dateCnt += 1;
         if (ope > 4000 && (cost + ope * cnt) > -cost * profitPercent)
         {
@@ -123,7 +106,7 @@ int startSimulation(int dataIndex, vector<float> buyPercent, vector<float> sellP
             newPrice = round(ope * (1 - buyPercent[j] / 100));
             newCount = floor(ONE_COST / newPrice * 10) / 10;
             profit = cost - newPrice * newCount - (close < newPrice ? 0 : sellPrice);
-            if (newPrice >= low && (startBuild && newPrice < 3920 || cost + newPrice * cnt < 0) && profit > -300000)
+            if (newPrice >= low && (startBuild || cost + newPrice * cnt < 0) && profit > -MAX_COST)
             {
                 cost = cost - (newPrice * newCount) * (1 + COMMISSION);
                 cnt = cnt + newCount;
@@ -144,10 +127,14 @@ int startSimulation(int dataIndex, vector<float> buyPercent, vector<float> sellP
         {
             simulationList.push_back(dataList[i + 1] + "," + float2Str(totalCost) + "," + float2Str(cost) + "," + float2Str(cnt, 1) + "," + float2Str(price) + "," + float2Str(profit) + "," + float2Str(point));
         }
+        if (cost == 0)
+        {
+            break;
+        }
     }
     if (output)
     {
-        string simualtionPath = DATA_PATH + START_DATE[dataIndex] + "ETF.csv";
+        string simualtionPath = DATA_PATH + simulationDateList[dataIndex] + "ETF.csv";
         ofstream simualtionFile(simualtionPath);
         for (string line : simulationList)
         {
@@ -219,14 +206,15 @@ void simulataAll()
                                     sellPercent[2] = jjj;
                                     totalProfit = 0;
                                     count += 1;
-                                    for (int k = 0; k < START_DATE.size(); k++)
+                                    dateCnt = 0;
+                                    for (int k = 0; k < simulationDateList.size(); k++)
                                     {
                                         float p = startSimulation(k, buyPercent, sellPercent, 0.1);
                                         totalProfit += p;
                                     }
-                                    if (totalProfit / dateCnt > 200)
+                                    if (totalProfit / dateCnt > 300)
                                     {
-                                        profitList.push_back(vector2Str(buyPercent) + ',' + vector2Str(sellPercent) + ',' + to_string(buildCnt) + ',' + to_string(dateCnt) + ',' + float2Str(totalProfit / dateCnt));
+                                        profitList.push_back(vector2Str(buyPercent) + ',' + vector2Str(sellPercent) + ',' + to_string(simulationDateList.size()) + ',' + to_string(dateCnt) + ',' + float2Str(totalProfit / dateCnt));
                                     }
                                     if (progress != float2Str((float)count / size * 100, 1))
                                     {
@@ -254,7 +242,8 @@ void simulataOne()
     vector<float> buyPercent = {0.4, 0.7, 0.7, 1.3, 1.4};
     vector<float> sellPercent = {0.5, 1.3, 7.1};
     totalProfit = 0;
-    for (int k = 0; k < START_DATE.size(); k++)
+    dateCnt = 0;
+    for (int k = 0; k < simulationDateList.size(); k++)
     {
         float p = startSimulation(k, buyPercent, sellPercent, 0.1, true);
         totalProfit += p;
@@ -269,6 +258,7 @@ int main()
         dataList.push_back(line);
     }
     dataFile.close();
+    simulationDateList.clear();
     for (int i = 1; i < dataList.size(); i++)
     {
         DayData dayData;
@@ -278,10 +268,13 @@ int main()
         dayData.high = stof(dataList[i].substr(17, 5)) * 1000;
         dayData.low = stof(dataList[i].substr(23, 5)) * 1000;
         dayData.close = stof(dataList[i].substr(29, 5)) * 1000;
-        dayData.base = round(dayData.ope / 1000);
-        dayData.cent = dayData.base * 10;
-        dayData.countBase = 10 - dayData.base;
         dayDataList.push_back(dayData);
+
+        if (dayData.close * 0.998 < BUILD_PRICE && BUILD_PRICE < dayData.close * 1.002)
+        {
+            cout << dayData.date << " " << dayData.close << endl;
+            simulationDateList.push_back(dayData.date);
+        }
     }
     simulataOne();
     simulataAll();
