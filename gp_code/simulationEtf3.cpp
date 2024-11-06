@@ -7,17 +7,15 @@ struct DayData
     int base, cent, countBase;
 };
 float COMMISSION = 0.00005;
+float BUILD_PRICE = 3870;
 int ONE_COST = 20000;
-string DATA_PATH = "D:\\gp\\code\\dataEtfTest.csv";
-// string DATA_PATH = "S:\\codes\\gp\\dataEtf.csv";
+string DATA_PATH = "D:\\gp\\data\\";
+string INPUT_PATH = DATA_PATH + "dataEtf.csv";
 string line;
-char c;
 vector<string> dataList;
 vector<DayData> dayDataList;
-vector<string> START_DATE = {"2023-07-31"};
+vector<string> START_DATE = {"2015-05-29",};
 // vector<string> START_DATE = {"2015-05-29","2020-07-03","2022-03-09","2023-07-31","2024-10-14"}; // 3.8+
-// vector<string> START_DATE = {"2015-07-16", "2017-10-12", "2018-05-22", "2019-04-01",
-//                              "2019-11-20", "2020-06-15", "2022-05-06", "2023-08-10"}; // 3900+
 string float2Str(float f, int decimal = 2)
 {
     ostringstream oss;
@@ -36,7 +34,7 @@ string vector2Str(vector<float> vec, int decimal = 2)
 }
 string date;
 float ope, high, low, close, newPrice, sellPrice, totalCost, cost, price, profit, point, newCount, cnt, totalProfit;
-int base, cent, countBase, originalProfit;
+int base, cent, countBase, originalProfit, buildCnt, dateCnt;
 vector<string> simulationList;
 DayData dayData;
 int startSimulation(int dataIndex, vector<float> buyPercent, vector<float> sellPercent, float profitPercent = 1.5, bool output = false)
@@ -47,9 +45,12 @@ int startSimulation(int dataIndex, vector<float> buyPercent, vector<float> sellP
     price = 0;
     profit = 0;
     point = 0;
+    buildCnt = 0;
+    dateCnt = 0;
     simulationList.clear();
     simulationList.push_back("date,open,high,low,close,totalCost,cost,cnt,price,profit,point");
     bool start = false;
+    bool startBuild = false;
     for (int i = 0; i < dayDataList.size(); i++)
     {
         if (dayDataList[i].date == START_DATE[dataIndex])
@@ -70,6 +71,20 @@ int startSimulation(int dataIndex, vector<float> buyPercent, vector<float> sellP
         cent = dayData.cent;
         countBase = dayData.countBase;
         sellPrice = 0;
+        if (!startBuild && cnt == 0)
+        {
+            if (close * 0.999 < BUILD_PRICE && BUILD_PRICE < close * 1.001)
+            {
+                if (output)
+                {
+                    cout << date << " " << close << endl;
+                }
+                buildCnt += 1;
+                startBuild = true;
+            }
+            continue;
+        }
+        dateCnt += 1;
         if (ope > 4000 && (cost + ope * cnt) > -cost * profitPercent)
         {
             cost = cost + (ope * cnt) * (1 - COMMISSION);
@@ -79,16 +94,12 @@ int startSimulation(int dataIndex, vector<float> buyPercent, vector<float> sellP
         {
             for (int j = 0; j < sellPercent.size(); j++)
             {
+                if (j > 0 && sellPercent[j - 1] == sellPercent[j])
+                {
+                    continue;
+                }
                 newPrice = round(ope * (1 + sellPercent[j] / 100));
-                if (j < sellPercent.size() - 1 && sellPercent[j] == sellPercent[j + 1])
-                {
-                    newCount = floor(ONE_COST * 2 / newPrice * 10) / 10;
-                    j++;
-                }
-                else
-                {
-                    newCount = floor(ONE_COST / newPrice * 10) / 10;
-                }
+                newCount = floor(ONE_COST / newPrice * 10) / 10;
                 if (newPrice <= high && cnt > 0 && cost + newPrice * cnt > 0)
                 {
                     newCount = min(newCount, cnt);
@@ -105,21 +116,18 @@ int startSimulation(int dataIndex, vector<float> buyPercent, vector<float> sellP
         }
         for (int j = 0; j < buyPercent.size(); j++)
         {
+            // if (j > 0 && buyPercent[j - 1] == buyPercent[j])
+            // {
+            //     continue;
+            // }
             newPrice = round(ope * (1 - buyPercent[j] / 100));
-            if (j < buyPercent.size() - 1 && buyPercent[j] == buyPercent[j + 1])
-            {
-                newCount = floor(ONE_COST * 2 / newPrice * 10) / 10;
-                j++;
-            }
-            else
-            {
-                newCount = floor(ONE_COST / newPrice * 10) / 10;
-            }
-            profit = totalCost + cost - newPrice * newCount - (close < newPrice ? 0 : sellPrice);
-            if (newPrice >= low && (cost == 0 && newPrice < 3920 || cost + newPrice * cnt < 0) && profit > -300000)
+            newCount = floor(ONE_COST / newPrice * 10) / 10;
+            profit = cost - newPrice * newCount - (close < newPrice ? 0 : sellPrice);
+            if (newPrice >= low && (startBuild && newPrice < 3920 || cost + newPrice * cnt < 0) && profit > -300000)
             {
                 cost = cost - (newPrice * newCount) * (1 + COMMISSION);
                 cnt = cnt + newCount;
+                startBuild = false;
             }
         }
         price = close * cnt;
@@ -139,7 +147,7 @@ int startSimulation(int dataIndex, vector<float> buyPercent, vector<float> sellP
     }
     if (output)
     {
-        string simualtionPath = "D:\\gp\\data\\" + START_DATE[dataIndex] + "ETF.csv";
+        string simualtionPath = DATA_PATH + START_DATE[dataIndex] + "ETF.csv";
         ofstream simualtionFile(simualtionPath);
         for (string line : simulationList)
         {
@@ -155,19 +163,20 @@ void simulataAll()
     int size = 0;
     for (float i0 = 0; i0 < 0.7; i0 += 0.1)
     {
-        for (float i = i0; i < 1.3; i += 0.1)
+        for (float i = i0; i < 1.2; i += 0.1)
         {
-            for (float ii = i; ii < 1.9; ii += 0.1)
+            for (float ii = i; ii < 1.7; ii += 0.1)
             {
-                for (float iii = ii; iii < 2.6; iii += 0.1)
+                for (float iii = ii; iii < 2.1; iii += 0.1)
                 {
                     // for (float iiii = iii; iiii < 3; iiii += 0.1)
                     // {
-                        for (float j = 0.4; j < 1.1; j += 0.1)
+                    //     buyPercent[4] = iiii;
+                        for (float j = 0.4; j < 0.9; j += 0.1)
                         {
-                            for (float jj = j; jj < 2.1; jj += 0.1)
+                            for (float jj = j; jj < 1.5; jj += 0.1)
                             {
-                                for (float jjj = jj; jjj < 2.6; jjj += 0.1)
+                                for (float jjj = jj; jjj < 2.1; jjj += 0.1)
                                 {
                                     size += 1;
                                 }
@@ -187,39 +196,37 @@ void simulataAll()
     for (float i0 = 0; i0 < 0.7; i0 += 0.1)
     {
         buyPercent[0] = i0;
-        for (float i = i0; i < 1.3; i += 0.1)
+        for (float i = i0; i < 1.2; i += 0.1)
         {
             buyPercent[1] = i;
-            for (float ii = i; ii < 1.9; ii += 0.1)
+            for (float ii = i; ii < 1.7; ii += 0.1)
             {
                 buyPercent[2] = ii;
-                for (float iii = ii; iii < 2.6; iii += 0.1)
+                for (float iii = ii; iii < 2.1; iii += 0.1)
                 {
                     buyPercent[3] = iii;
                     // for (float iiii = iii; iiii < 3; iiii += 0.1)
                     // {
                     //     buyPercent[4] = iiii;
-                        for (float j = 0.4; j < 1.1; j += 0.1)
+                        for (float j = 0.4; j < 0.9; j += 0.1)
                         {
                             sellPercent[0] = j;
-                            for (float jj = j; jj < 2.1; jj += 0.1)
+                            for (float jj = j; jj < 1.5; jj += 0.1)
                             {
                                 sellPercent[1] = jj;
-                                for (float jjj = jj; jjj < 2.6; jjj += 0.1)
+                                for (float jjj = jj; jjj < 2.1; jjj += 0.1)
                                 {
                                     sellPercent[2] = jjj;
-                                    originalProfit = 0;
                                     totalProfit = 0;
                                     count += 1;
                                     for (int k = 0; k < START_DATE.size(); k++)
                                     {
                                         float p = startSimulation(k, buyPercent, sellPercent, 0.1);
-                                        originalProfit += p;
-                                        totalProfit += p / (START_DATE.size() - k);
+                                        totalProfit += p;
                                     }
-                                    if (totalProfit > 180000)
+                                    if (totalProfit / dateCnt > 200)
                                     {
-                                        profitList.push_back(vector2Str(buyPercent) + ',' + vector2Str(sellPercent) + ',' + "0.1" + ',' + to_string(originalProfit) + ',' + float2Str(totalProfit, 0));
+                                        profitList.push_back(vector2Str(buyPercent) + ',' + vector2Str(sellPercent) + ',' + to_string(buildCnt) + ',' + to_string(dateCnt) + ',' + float2Str(totalProfit / dateCnt));
                                     }
                                     if (progress != float2Str((float)count / size * 100, 1))
                                     {
@@ -234,7 +241,7 @@ void simulataAll()
             }
         }
     }
-    string totalPath = "D:\\gp\\data\\total" + START_DATE[0] + "ETF.csv";
+    string totalPath = DATA_PATH + "total" + START_DATE[0] + "ETF.csv";
     ofstream totalFile(totalPath);
     for (string line : profitList)
     {
@@ -244,22 +251,20 @@ void simulataAll()
 }
 void simulataOne()
 {
-    vector<float> buyPercent = {0.1, 0.3, 1.4, 1.8, 2.0};
-    vector<float> sellPercent = {0.7, 1.2};
-    originalProfit = 0;
+    vector<float> buyPercent = {0.4, 0.7, 0.7, 1.3, 1.4};
+    vector<float> sellPercent = {0.5, 1.3, 7.1};
     totalProfit = 0;
     for (int k = 0; k < START_DATE.size(); k++)
     {
         float p = startSimulation(k, buyPercent, sellPercent, 0.1, true);
-        originalProfit += p;
-        totalProfit += p / (START_DATE.size() - k);
+        totalProfit += p;
     }
-    cout << "originalProfit: " << originalProfit << endl;
-    cout << "totalProfit: " << float2Str(totalProfit) << endl;
+    cout << "dateCnt: " << dateCnt << endl;
+    cout << "totalProfit: " << float2Str(totalProfit / dateCnt) << endl;
 }
 int main()
 {
-    ifstream dataFile(DATA_PATH);
+    ifstream dataFile(INPUT_PATH);
     while (getline(dataFile, line)) {
         dataList.push_back(line);
     }
