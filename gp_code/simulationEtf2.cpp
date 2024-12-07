@@ -7,17 +7,17 @@ struct DayData
     int base, cent, countBase;
 };
 float COMMISSION = 0.00005;
-int ONE_COST = 15000;
-string DATA_PATH = "D:\\gp\\code\\dataEtfTest.csv";
-// string DATA_PATH = "S:\\codes\\gp\\dataEtf.csv";
+float BUILD_PRICE = 3920;
+int ONE_COST = 10000;
+int MAX_COST = 300000;
+string DATA_PATH = "D:\\codes\\gp_code\\dataEtf.csv";
 string line;
 char c;
 vector<string> dataList;
 vector<DayData> dayDataList;
-vector<string> START_DATE = {"2022-03-09","2023-07-31"};
+vector<string> START_DATE = {"2022-03-09"};
 // vector<string> START_DATE = {"2015-05-29","2020-07-03","2022-03-09","2023-07-31","2024-10-14"}; // 3.8+
-// vector<string> START_DATE = {"2015-07-16", "2017-10-12", "2018-05-22", "2019-04-01",
-//                              "2019-11-20", "2020-06-15", "2022-05-06", "2023-08-10"}; // 3900+
+// vector<string> START_DATE = {"2019-12-20","2020-12-18","2021-12-17","2022-12-16","2023-12-15"}; // 5 year
 string float2Str(float f, int decimal = 2)
 {
     ostringstream oss;
@@ -60,10 +60,10 @@ int startSimulation(int dataIndex, vector<float> buyPercent, vector<float> sellP
         {
             continue;
         }
-        else if (dataIndex + 1 < START_DATE.size() && dayDataList[i].date == START_DATE[dataIndex + 1])
-        {
-            break;
-        }
+        // else if (dataIndex + 1 < START_DATE.size() && dayDataList[i].date == START_DATE[dataIndex + 1])
+        // {
+        //     break;
+        // }
         dayData = dayDataList[i];
         date = dayData.date;
         ope = dayData.ope;
@@ -120,7 +120,7 @@ int startSimulation(int dataIndex, vector<float> buyPercent, vector<float> sellP
                 newCount = floor(ONE_COST / newPrice * 10) / 10;
             }
             profit = totalCost + cost - newPrice * newCount - (close < newPrice ? 0 : sellPrice);
-            if (newPrice >= low && (cost == 0 && newPrice < 3920 || cost + newPrice * cnt < 0) && profit > -300000)
+            if (newPrice >= low && (cost == 0 && newPrice < BUILD_PRICE || cost + newPrice * cnt < 0) && profit > -MAX_COST)
             {
                 cost = cost - (newPrice * newCount) * (1 + COMMISSION);
                 cnt = cnt + newCount;
@@ -228,8 +228,8 @@ void simulataAll()
 }
 void simulataOne()
 {
-    vector<float> buyPercent = {0.2,0.2,0.3,0.3,0.4,0.4,1.0,1.2,1.3,1.3,1.4,2.0};
-    vector<float> sellPercent = {0.4,0.4,0.6,1.2,1.2,1.9,1.9};
+    vector<float> buyPercent = {0.1,0.1,0.2,0.2,0.4,0.6,1.0,1.3,1.3,1.4,2.0,2.0};
+    vector<float> sellPercent = {0.4,0.4,0.6,1.2,1.2};
     originalProfit = 0;
     totalProfit = 0;
     for (int k = 0; k < START_DATE.size(); k++)

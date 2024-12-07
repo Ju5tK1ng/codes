@@ -6,12 +6,12 @@ struct DayData
     double ope, high, low, close;
     int base, cent, countBase;
 };
-string DATA_PATH = "D:\\gp\\code\\dataEtfTest.csv";
+string DATA_PATH = "D:\\gp\\code\\dataGold.csv";
 // string DATA_PATH = "S:\\codes\\gp\\dataEtf.csv";
 string line;
 vector<string> dataList;
 vector<DayData> dayDataList;
-vector<string> START_DATE = {"2022-03-09"};
+vector<string> START_DATE = {"2015-05-29"};
 // vector<string> START_DATE = {"2015-05-29","2020-07-03","2022-03-09","2023-07-31","2024-10-14"}; // 3.8+
 string float2Str(double f, int decimal = 2)
 {
