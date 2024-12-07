@@ -6,11 +6,11 @@ struct DayData
     float ope, high, low, close;
 };
 float COMMISSION = 0.00005;
-int ONE_COST = 20000;
+int ONE_COST = 10000;
 int MAX_COST = 300000;
 string DATA_PATH = "D:\\gp\\data\\";
 string INPUT_PATH = "D:\\codes\\gp_code\\dataDividend.csv";
-string OUTPUT_NAME = "Dividend3.csv";
+string OUTPUT_NAME = "Dividend2.csv";
 string line, date;
 vector<string> dataList;
 vector<DayData> dayDataList;
@@ -72,12 +72,16 @@ int startSimulation(int dataIndex, vector<float> buyPercent, vector<float> sellP
         dateCnt += 1;
         for (int j = 0; j < sellPercent.size(); j++)
         {
-            if (j > 0 && sellPercent[j - 1] == sellPercent[j])
-            {
-                continue;
-            }
             newPrice = round(ope * (1 + sellPercent[j] / 100));
-            newCount = floor(ONE_COST / newPrice * 10) / 10;
+            if (j < sellPercent.size() - 1 && sellPercent[j] == sellPercent[j + 1])
+            {
+                newCount = floor(ONE_COST * 2 / newPrice * 10) / 10;
+                j++;
+            }
+            else
+            {
+                newCount = floor(ONE_COST / newPrice * 10) / 10;
+            }
             if (newPrice <= high && cnt > 0)
             {
                 newCount = min(newCount, cnt);
@@ -93,12 +97,16 @@ int startSimulation(int dataIndex, vector<float> buyPercent, vector<float> sellP
         }
         for (int j = 0; j < buyPercent.size(); j++)
         {
-            if (j > 0 && buyPercent[j - 1] == buyPercent[j])
-            {
-                continue;
-            }
             newPrice = round(ope * (1 - buyPercent[j] / 100));
-            newCount = floor(ONE_COST / newPrice * 10) / 10;
+            if (j < buyPercent.size() - 1 && buyPercent[j] == buyPercent[j + 1])
+            {
+                newCount = floor(ONE_COST * 2 / newPrice * 10) / 10;
+                j++;
+            }
+            else
+            {
+                newCount = floor(ONE_COST / newPrice * 10) / 10;
+            }
             profit = cost - newPrice * newCount - (close < newPrice ? 0 : sellPrice);
             if (newPrice >= low && profit > -MAX_COST)
             {
@@ -135,78 +143,66 @@ int startSimulation(int dataIndex, vector<float> buyPercent, vector<float> sellP
 }
 void simulataAll()
 {
+    // vector<float> BUY_PERCENT = {0.0,0.3,0.4,0.5,0.6,0.7,0.8,1.2,1.7,1.8,2.1};
+    // vector<float> SELL_PERCENT = {0.3,0.4,0.7,0.9,1.0,1.1,1.3,1.6,1.8,2.0};
+    // vector<float> BUY_PERCENT = {0.0,0.3,0.4,0.5,0.6,0.8,1.2,1.8,2.1};
+    // vector<float> SELL_PERCENT = {0.3,0.4,0.7,0.9,1.0,1.1,1.6,1.8};
+    vector<float> BUY_PERCENT = {0.0,0.3,0.4,0.6,0.8,1.2,1.8,2.1};
+    vector<float> SELL_PERCENT = {0.3,0.4,0.7,0.9,1.1,1.6,1.8};
     string progress = "";
-    int size = 0;
-    for (float i0 = 0; i0 < 0.9; i0 += 0.1)
-    {
-        for (float i = i0; i < 2.1; i += 0.1)
-        {
-            for (float ii = i; ii < 3.1; ii += 0.1)
-            {
-                // for (float iii = ii; iii < 2.1; iii += 0.1)
-                // {
-                    for (float j = 0.4; j < 1.5; j += 0.1)
-                    {
-                        for (float jj = j; jj < 1.5; jj += 0.1)
-                        {
-                            for (float jjj = jj; jjj < 2.1; jjj += 0.1)
-                            {
-                                size += 1;
-                            }
-                        }
-                    }
-                // }
-            }
-        }
-    }
+    int size = round(pow(3, BUY_PERCENT.size())) * round(pow(3, SELL_PERCENT.size()));
     cout << "size: " << size << endl;
-    vector<float> buyPercent = {0, 0, 0};
-    vector<float> sellPercent = {0, 0, 0};
+    vector<float> buyPercent;
+    vector<float> sellPercent;
     vector<string> profitList;
     int count = 0;
     int startTime = time(nullptr);
-    for (float i0 = 0; i0 < 0.9; i0 += 0.1)
+    for (int i = 0; i < pow(3, BUY_PERCENT.size()); i++)
     {
-        buyPercent[0] = i0;
-        for (float i = i0; i < 2.1; i += 0.1)
+        buyPercent.clear();
+        for (int t = 0; t < BUY_PERCENT.size(); t++)
         {
-            buyPercent[1] = i;
-            for (float ii = i; ii < 3.1; ii += 0.1)
+            if (i % int(pow(3, t + 1)) / int(pow(3, t)) == 1)
             {
-                buyPercent[2] = ii;
-                // for (float iii = ii; iii < 2.1; iii += 0.1)
-                // {
-                //     buyPercent[3] = iii;
-                    for (float j = 0.4; j < 1.5; j += 0.1)
-                    {
-                        sellPercent[0] = j;
-                        for (float jj = j; jj < 1.5; jj += 0.1)
-                        {
-                            sellPercent[1] = jj;
-                            for (float jjj = jj; jjj < 2.1; jjj += 0.1)
-                            {
-                                sellPercent[2] = jjj;
-                                totalProfit = 0;
-                                count += 1;
-                                dateCnt = 0;
-                                for (int k = 0; k < START_DATE.size(); k++)
-                                {
-                                    float p = startSimulation(k, buyPercent, sellPercent);
-                                    totalProfit += p;
-                                }
-                                if (totalProfit > 124000)
-                                {
-                                    profitList.push_back(vector2Str(buyPercent, 1) + ',' + vector2Str(sellPercent, 1) + ',' + to_string(totalProfit) + ',' + to_string(dateCnt) + ',' + float2Str(totalProfit / dateCnt));
-                                }
-                                if (progress != float2Str((float)count / size * 100, 1))
-                                {
-                                    progress = float2Str((float)count / size * 100, 1);
-                                    cout << progress << "%  time:" << float2Str((time(nullptr) - startTime) / (float)count * (size - count) / 60)  << endl;
-                                }
-                            }
-                        }
-                    }
-                // }
+                buyPercent.push_back(BUY_PERCENT[t]);
+            }
+            else if (i % int(pow(3, t + 1)) / int(pow(3, t)) == 2)
+            {
+                buyPercent.push_back(BUY_PERCENT[t]);
+                buyPercent.push_back(BUY_PERCENT[t]);
+            }
+        }
+        for (int j = 0; j < pow(3, SELL_PERCENT.size()); j++)
+        {
+            sellPercent.clear();
+            for (int t = 0; t < SELL_PERCENT.size(); t++)
+            {
+                if (j % int(pow(3, t + 1)) / int(pow(3, t)) == 1)
+                {
+                    sellPercent.push_back(SELL_PERCENT[t]);
+                }
+                else if (j % int(pow(3, t + 1)) / int(pow(3, t)) == 2)
+                {
+                    sellPercent.push_back(SELL_PERCENT[t]);
+                    sellPercent.push_back(SELL_PERCENT[t]);
+                }
+            }
+            totalProfit = 0;
+            count += 1;
+            dateCnt = 0;
+            for (int k = 0; k < START_DATE.size(); k++)
+            {
+                float p = startSimulation(k, buyPercent, sellPercent);
+                totalProfit += p;
+            }
+            if (totalProfit > 124000)
+            {
+                profitList.push_back(vector2Str(buyPercent, 1) + ',' + vector2Str(sellPercent, 1) + ',' + float2Str(totalProfit) + ',' + to_string(dateCnt) + ',' + float2Str(totalProfit / dateCnt));
+            }
+            if (progress != float2Str((float)count / size * 100, 1))
+            {
+                progress = float2Str((float)count / size * 100, 1);
+                cout << progress << "%  time:" << float2Str((time(nullptr) - startTime) / (float)count * (size - count) / 60)  << endl;
             }
         }
     }
@@ -220,8 +216,8 @@ void simulataAll()
 }
 void simulataOne()
 {
-    vector<float> buyPercent = {0, 0, 2.1};
-    vector<float> sellPercent = {0.4, 1, 1.8};
+    vector<float> buyPercent = {0, 0, 2.1, 2.1};
+    vector<float> sellPercent = {0.4, 0.4, 1, 1, 1.8, 1.8};
     totalProfit = 0;
     dateCnt = 0;
     for (int k = 0; k < START_DATE.size(); k++)
