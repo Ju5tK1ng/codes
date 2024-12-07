@@ -14,9 +14,9 @@ string INPUT_PATH = DATA_PATH + "dataEtf.csv";
 string line, date;
 vector<string> dataList;
 vector<DayData> dayDataList;
-vector<string> simulationDateList;
 vector<string> START_DATE = {"2015-05-29",};
 // vector<string> START_DATE = {"2015-05-29","2020-07-03","2022-03-09","2023-07-31","2024-10-14"}; // 3.8+
+// vector<string> START_DATE = {"2019-12-20","2020-12-18","2021-12-17","2022-12-16","2023-12-15"}; // 5 year
 string float2Str(float f, int decimal = 2)
 {
     ostringstream oss;
@@ -34,7 +34,7 @@ string vector2Str(vector<float> vec, int decimal = 2)
     return str;
 }
 float ope, high, low, close, newPrice, sellPrice, totalCost, cost, price, profit, point, newCount, cnt, totalProfit;
-int originalProfit, dateCnt;
+int dateCnt;
 vector<string> simulationList;
 DayData dayData;
 int startSimulation(int dataIndex, vector<float> buyPercent, vector<float> sellPercent, float profitPercent = 1.5, bool output = false)
@@ -51,10 +51,9 @@ int startSimulation(int dataIndex, vector<float> buyPercent, vector<float> sellP
     bool startBuild = true;
     for (int i = 0; i < dayDataList.size(); i++)
     {
-        if (dayDataList[i].date == simulationDateList[dataIndex])
+        if (dayDataList[i].date == START_DATE[dataIndex])
         {
             start = true;
-            // continue;
         }
         if (!start)
         {
@@ -134,7 +133,7 @@ int startSimulation(int dataIndex, vector<float> buyPercent, vector<float> sellP
     }
     if (output)
     {
-        string simualtionPath = DATA_PATH + simulationDateList[dataIndex] + "ETF.csv";
+        string simualtionPath = DATA_PATH + START_DATE[dataIndex] + "ETF3.csv";
         ofstream simualtionFile(simualtionPath);
         for (string line : simulationList)
         {
@@ -207,14 +206,14 @@ void simulataAll()
                                     totalProfit = 0;
                                     count += 1;
                                     dateCnt = 0;
-                                    for (int k = 0; k < simulationDateList.size(); k++)
+                                    for (int k = 0; k < START_DATE.size(); k++)
                                     {
                                         float p = startSimulation(k, buyPercent, sellPercent, 0.1);
                                         totalProfit += p;
                                     }
                                     if (totalProfit / dateCnt > 300)
                                     {
-                                        profitList.push_back(vector2Str(buyPercent) + ',' + vector2Str(sellPercent) + ',' + to_string(simulationDateList.size()) + ',' + to_string(dateCnt) + ',' + float2Str(totalProfit / dateCnt));
+                                        profitList.push_back(vector2Str(buyPercent) + ',' + vector2Str(sellPercent) + ',' + to_string(START_DATE.size()) + ',' + to_string(dateCnt) + ',' + float2Str(totalProfit / dateCnt));
                                     }
                                     if (progress != float2Str((float)count / size * 100, 1))
                                     {
@@ -229,7 +228,7 @@ void simulataAll()
             }
         }
     }
-    string totalPath = DATA_PATH + "total" + START_DATE[0] + "ETF.csv";
+    string totalPath = DATA_PATH + "total" + START_DATE[0] + "ETF3.csv";
     ofstream totalFile(totalPath);
     for (string line : profitList)
     {
@@ -243,13 +242,15 @@ void simulataOne()
     vector<float> sellPercent = {0.5, 1.3, 7.1};
     totalProfit = 0;
     dateCnt = 0;
-    for (int k = 0; k < simulationDateList.size(); k++)
+    for (int k = 0; k < START_DATE.size(); k++)
     {
         float p = startSimulation(k, buyPercent, sellPercent, 0.1, true);
         totalProfit += p;
+        cout << "p: " << p << endl;
     }
+    cout << "totalProfit: " << float2Str(totalProfit) << endl;
     cout << "dateCnt: " << dateCnt << endl;
-    cout << "totalProfit: " << float2Str(totalProfit / dateCnt) << endl;
+    cout << "oneDayProfit: " << float2Str(totalProfit / dateCnt) << endl;
 }
 int main()
 {
@@ -258,7 +259,6 @@ int main()
         dataList.push_back(line);
     }
     dataFile.close();
-    simulationDateList.clear();
     for (int i = 1; i < dataList.size(); i++)
     {
         DayData dayData;
@@ -269,12 +269,6 @@ int main()
         dayData.low = stof(dataList[i].substr(23, 5)) * 1000;
         dayData.close = stof(dataList[i].substr(29, 5)) * 1000;
         dayDataList.push_back(dayData);
-
-        if (dayData.close * 0.998 < BUILD_PRICE && BUILD_PRICE < dayData.close * 1.002)
-        {
-            cout << dayData.date << " " << dayData.close << endl;
-            simulationDateList.push_back(dayData.date);
-        }
     }
     simulataOne();
     simulataAll();
