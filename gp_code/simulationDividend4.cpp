@@ -11,7 +11,7 @@ int MAX_COST = 300000;
 float START_POSITION = 0.5;
 string DATA_PATH = "D:\\gp\\data\\";
 string INPUT_PATH = "D:\\codes\\gp_code\\dataDividend.csv";
-string OUTPUT_NAME = "Dividend2_" + to_string(int(START_POSITION * 100)) + ".csv";
+string OUTPUT_NAME = "Dividend4_" + to_string(int(START_POSITION * 100)) + ".csv";
 string line, date;
 vector<string> dataList;
 vector<DayData> dayDataList;
@@ -155,7 +155,7 @@ void simulataAll()
     // vector<float> SELL_PERCENT = {0.3,0.4,0.7,0.9,1.0,1.1,1.3,1.6,1.8,2.0};
     // vector<float> BUY_PERCENT = {0.0,0.6,0.7,0.8,1.2,1.7,1.8,2.1};
     // vector<float> SELL_PERCENT = {0.3,0.4,0.9,1.0,1.1,1.3,1.6,1.8,2.0};
-    vector<float> BUY_PERCENT = {0.0,0.3,0.4,0.5,0.6,0.8,1.2,1.8,2.1};
+    vector<float> BUY_PERCENT = {0.3,0.4,0.5,0.6,0.8,1.2,1.8,2.1};
     vector<float> SELL_PERCENT = {0.3,0.4,0.7,0.9,1.0,1.1,1.6,1.8};
     string progress = "";
     int size = round(pow(3, BUY_PERCENT.size())) * round(pow(3, SELL_PERCENT.size()));
