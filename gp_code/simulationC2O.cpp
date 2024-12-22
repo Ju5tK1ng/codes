@@ -3,14 +3,14 @@ using namespace std;
 struct DayData
 {
     string date;
-    double ope, high, low, close;
+    double ope, close, high, low;
 };
+double COMMISSION = 0.00005;
 string INPUT_PATH = "D:\\gp\\data\\";
-string OUTPUT_PATH = "D:\\gp\\data\\inOrOut";
+string OUTPUT_PATH = "D:\\gp\\data\\simulationC2O";
 string line;
-vector<string> idList = {"510310", "515180", "512880", "518880", "513090", "159545", "513910", "513260", "159636", "159792", "159985", "513730",
-                         "159696", "513390", "159660", "513850", "513500", "159980"};
-vector<string> dataList, simulationList, resultList, resultAllList;
+string id = "513090";
+vector<string> dataList, simulationList, resultList;
 vector<DayData> dayDataList;
 vector<string> START_DATE = {"2020-03-26"};
 // vector<string> START_DATE = {"2015-05-29","2020-07-03","2022-03-09","2023-07-31","2024-10-14"}; // 3.8+
@@ -30,7 +30,7 @@ string vector2Str(vector<double> vec)
     str = str.substr(0, str.length() - 1);
     return str;
 }
-string calcOne(string id, bool start)
+string calcOne(string id, double buyRate)
 {
     dataList.clear();
     ifstream dataFile(INPUT_PATH + id + ".csv");
@@ -40,11 +40,11 @@ string calcOne(string id, bool start)
     dataFile.close();
     int cnt =  0;
     double close_ope = 100;
-    double ope_close = 100;
-    double profit, c2o, o2c;
-    double lastClose = 0;
+    double profit = 100, c2o;
+    double lastClose = 0, buy = 0, sell;
+    bool start = false;
     simulationList.clear();
-    simulationList.push_back("date,open,close,close_ope,ope_close,profit,c2o,o2c");
+    simulationList.push_back("date,open,close,high,c2o,close_ope,buy,sell,profit");
     for (int i = 1; i < dataList.size(); i++)
     {
         DayData dayData;
@@ -67,6 +67,10 @@ string calcOne(string id, bool start)
                 else if (commaCnt == 3)
                 {
                     dayData.close = stod(num) * 1000;
+                }
+                else if (commaCnt == 4)
+                {
+                    dayData.high = stod(num) * 1000;
                     dataList[i] = dataList[i].substr(0, j);
                     break;
                 }
@@ -82,53 +86,57 @@ string calcOne(string id, bool start)
         {
             start = true;
         }
-        if (start && lastClose != 0)
+        if (start && buy != 0)
         {
             cnt += 1;
             c2o = dayData.ope / lastClose;
             close_ope = close_ope * c2o;
-            o2c = dayData.close / dayData.ope;
-            ope_close = ope_close * o2c;
-            profit = close_ope * ope_close / 100;
-            simulationList.push_back(dataList[i] + "," + float2Str(close_ope, 3) + "," + float2Str(ope_close, 3) + "," + float2Str(profit, 3) + "," + float2Str(c2o, 4) + "," + float2Str(o2c, 4));
+            if (sell <= dayData.ope)
+            {
+                profit = profit / buy * dayData.ope * (1 - COMMISSION * 2);
+                buy = dayData.close;
+                sell = round(buy * buyRate);
+            }
+            else if (sell <= dayData.high)
+            {
+                profit = profit / buy * sell * (1 - COMMISSION * 2);
+                buy = dayData.close;
+                sell = round(buy * buyRate);
+            }
+            // else
+            // {
+            //     sell = round(sell * buyRate);
+            // }
+            simulationList.push_back(dataList[i] + "," + float2Str(c2o, 3) + "," + float2Str(close_ope, 3) + "," + float2Str(buy, 0) + "," + float2Str(sell, 0) + "," + float2Str(profit, 3));
+        }
+        else
+        {
+            buy = dayData.close;
+            sell = round(buy * buyRate);
         }
         lastClose = dayData.close;
     }
-    string simualtionPath = OUTPUT_PATH + id + ".csv";
+    string simualtionPath = OUTPUT_PATH + id + "_" + float2Str(buyRate, 3) + ".csv";
     ofstream simulationFile(simualtionPath);
     for (string line : simulationList)
     {
         simulationFile << line << endl;
     }
     simulationFile.close();
-    string result = id + "," + float2Str(close_ope, 3) + "," + float2Str(ope_close, 3) + "," + float2Str(profit, 3) + "," + to_string(cnt) + ",";
-    result += float2Str((close_ope - 100) / cnt, 3) + "," + float2Str((ope_close - 100) / cnt, 3) + "," + float2Str((profit - 100) / cnt, 3);
+    string result = id + "," + float2Str(close_ope, 3) + "," + to_string(cnt) + "," + float2Str(buyRate, 3) + "," + float2Str(profit, 3);
     return result;
 }
 
 int main()
 {
-    resultAllList.clear();
-    resultAllList.push_back("id,close_ope,ope_close,profit,cnt,c2o,o2c,avg");
     resultList.clear();
-    resultList.push_back("id,close_ope,ope_close,profit,cnt,c2o,o2c,avg");
-    for (string id : idList)
+    resultList.push_back("id,close_ope,cnt,buyRate,profit");
+    for (double i = 0.970; i < 1.020; i += 0.001)
     {
-        string resultAll = calcOne(id, true);
-        resultAllList.push_back(resultAll);
-
-        string result = calcOne(id, false);
+        string result = calcOne(id, i);
         cout << result << endl;
         resultList.push_back(result);
     }
-
-    string resultAllPath = OUTPUT_PATH + ".csv";
-    ofstream resultAllFile(resultAllPath);
-    for (string line : resultAllList)
-    {
-        resultAllFile << line << endl;
-    }
-    resultAllFile.close();
 
     string resultPath = OUTPUT_PATH + START_DATE[0] + ".csv";
     ofstream resultFile(resultPath);
